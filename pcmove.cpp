@@ -947,7 +947,7 @@ void pcmove::tell_why_cannot_attack() {
   else if(c2->monst == moAngryDie)
     addMessage(XLAT("This die is really angry at you!"));
   else if((attackflags & AF_WEAK) && isIvy(c2))
-    addMessage(XLAT("You are too weakened to attack %the1!", c2->monst));
+    addMessage(XLAT("You cannot attack %the1 directly.", c2->monst));
   else if(isWorm(cwt.at->monst) && isWorm(c2->monst) && wormhead(cwt.at) == wormhead(c2) && cwt.at->monst != moTentacleGhost && c2->monst != moTentacleGhost)
     addMessage(XLAT("You cannot attack your own mount!"));
   else if(checkOrb(c2->monst, itOrbShield))
@@ -1159,6 +1159,13 @@ bool pcmove::attack() {
   if(items[itOrbSpeed]&1) attackflags |= AF_FAST;
   if(items[itOrbSlaying]) attackflags |= AF_CRUSH;
   if(items[itCurseWeakness]) attackflags |= AF_WEAK;
+  else if (!c2->stuntime)
+  {
+    if (items[itOrbThorns])
+      markOrb(itOrbThorns);
+    else 
+      attackflags |= AF_WEAK;
+  }
   
   bool ca = bow::crossbow_mode() ? good_tortoise : canAttack(cwt.at, moPlayer, c2, c2->monst, attackflags);
   
