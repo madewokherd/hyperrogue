@@ -1309,8 +1309,11 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
 
   if(peace::on) return;
   bool out = who == moPlayer && bow::crossbow_mode();
-  if ((who == moPlayer || (isFriendly(who) && items[itOrbEmpathy])) && items[itOrbSlaying])
-    stabFlags |= AF_CRUSH;
+  if (who == moPlayer || (isFriendly(who) && items[itOrbEmpathy]))
+  {
+    if (items[itOrbSlaying]) stabFlags |= AF_CRUSH;
+    if (items[itCurseWeakness]) stabFlags |= AF_WEAK;
+  }
   
   for(int t=0; t<mf->type; t++) {
     cell *c = mf->move(t);
