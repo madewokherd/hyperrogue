@@ -82,6 +82,8 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
 
   // cannot eat worms
   if((flags & AF_EAT) && isWorm(m2)) return false;
+
+  if ((flags & AF_STAB) && m1 == moPlayer && m2 == moMimic) return false;
   
   if(m1 == passive_switch || m2 == passive_switch) return false;
   
@@ -110,7 +112,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   if(among(m2, moAltDemon, moHexDemon, moPair, moCrusher, moNorthPole, moSouthPole, moMonk) && !(flags & (AF_EAT | AF_MAGIC | AF_BULL | AF_CRUSH)))
     return false;
   
-  if(m2 == moHedge && !(flags & (AF_STAB | AF_TOUGH | AF_EAT | AF_MAGIC | AF_LANCE | AF_SWORD_INTO | AF_HORNS | AF_BULL | AF_CRUSH)))
+  if((m2 == moHedge || m1 == moMimic) && !(flags & (AF_STAB | AF_TOUGH | AF_EAT | AF_MAGIC | AF_LANCE | AF_SWORD_INTO | AF_HORNS | AF_BULL | AF_CRUSH)))
     if(!checkOrb(m1, itOrbThorns)) return false;
   
   // krakens do not try to fight even with Discord
@@ -127,7 +129,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   if(!(flags & AF_NOSHIELD) && ((flags & AF_NEXTTURN) ? checkOrb2 : checkOrb)(m2, itOrbShield)) return false;
   
   if((flags & AF_STAB) && m2 != moHedge) {
-    if(m1 != moPlayer && !checkOrb(m1, itOrbThorns)) return false;
+    if(m1 != moPlayer && m1 != moMimic && !checkOrb(m1, itOrbThorns)) return false;
     else flags |= AF_IGNORE_UNARMED;
     }
 
