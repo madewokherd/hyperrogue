@@ -127,7 +127,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   if(!(flags & AF_NOSHIELD) && ((flags & AF_NEXTTURN) ? checkOrb2 : checkOrb)(m2, itOrbShield)) return false;
   
   if((flags & AF_STAB) && m2 != moHedge) {
-    if(!checkOrb(m1, itOrbThorns)) return false;
+    if(m1 != moPlayer && !checkOrb(m1, itOrbThorns)) return false;
     else flags |= AF_IGNORE_UNARMED;
     }
 
@@ -1317,13 +1317,13 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
     if(logical_adjacent(mt, who, c)) stabthere = true, away = false;
     if(inmirror(c)) c = mirror::reflect(c).at;
 
-    if(stabthere && c->wall == waExplosiveBarrel && markOrb(itOrbThorns))
+    if(stabthere && c->wall == waExplosiveBarrel)
       explodeBarrel(c);
     
     if(stabthere && (items[itOrbThorns] || !out) && canAttack(mt,who,c,c->monst,AF_STAB)) {
       changes.ccell(c);
       if(c->monst != moHedge || out) {
-        markOrb(itOrbThorns); if(who != moPlayer) markOrb(itOrbEmpathy);
+        if(who != moPlayer) { markOrb(itOrbThorns); markOrb(itOrbEmpathy); }
         }
       eMonster m = c->monst;
       int k = tkills();
