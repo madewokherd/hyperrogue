@@ -1295,6 +1295,7 @@ int lastdouble = -3;
 
 EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
   int numsh = 0, numflail = 0, numlance = 0, numslash = 0, numbb[2];
+  flagtype stabFlags = AF_STAB;
   
   numbb[0] = numbb[1] = 0;
 
@@ -1308,6 +1309,8 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
 
   if(peace::on) return;
   bool out = who == moPlayer && bow::crossbow_mode();
+  if ((who == moPlayer || (isFriendly(who) && items[itOrbEmpathy])) && items[itOrbSlaying])
+    stabFlags |= AF_CRUSH;
   
   for(int t=0; t<mf->type; t++) {
     cell *c = mf->move(t);
@@ -1320,14 +1323,14 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
     if(stabthere && c->wall == waExplosiveBarrel)
       explodeBarrel(c);
     
-    if(stabthere && (items[itOrbThorns] || !out) && canAttack(mt,who,c,c->monst,AF_STAB)) {
+    if(stabthere && (items[itOrbThorns] || !out) && canAttack(mt,who,c,c->monst,stabFlags)) {
       changes.ccell(c);
       if(c->monst != moHedge || out) {
         if(who != moPlayer) { markOrb(itOrbThorns); markOrb(itOrbEmpathy); }
         }
       eMonster m = c->monst;
       int k = tkills();
-      if(attackMonster(c, AF_STAB | AF_MSG, who))  {
+      if(attackMonster(c, stabFlags | AF_MSG, who))  {
         spread_plague(mt, c, t, who);
         produceGhost(c, m, who);
         }
