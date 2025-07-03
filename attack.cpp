@@ -412,6 +412,11 @@ EX void stunMonster(cell *c2, eMonster killer, flagtype flags) {
     ((flags & AF_WEAK) && !attackJustStuns(c2, flags &~ AF_WEAK, killer)) ? min(5+c2->stuntime, 15) :
     3);
   if(killer == moArrowTrap) newtime = min(newtime + 3, 7);
+  if (killer == moPlayer && !(flags & (AF_STAB|AF_BULL|AF_SIDE|AF_HORNS|AF_SWORD|AF_SWORD_INTO|AF_GUN|AF_APPROACH|AF_BACK|AF_LANCE|AF_MAGIC)) &&
+    !items[itOrbThorns] && newtime > 2)
+  {
+    newtime = 2;
+  }
   if(!(flags & AF_WEAK) && !isMetalBeast(c2->monst) && !among(c2->monst, moSkeleton, moReptile, moSalamander, moTortoise, moWorldTurtle, moBrownBug)) {
     c2->hitpoints--;
     if(c2->monst == moPrincess)
