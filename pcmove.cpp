@@ -946,8 +946,11 @@ void pcmove::tell_why_cannot_attack() {
     addMessage(XLAT("You cannot attack Jellies in their wall form!"));
   else if(c2->monst == moAngryDie)
     addMessage(XLAT("This die is really angry at you!"));
-  else if((attackflags & AF_WEAK) && isIvy(c2))
-    addMessage(XLAT("You cannot attack %the1 directly.", c2->monst));
+  else if((attackflags & AF_WEAK) && (isIvy(c2) || isMutantIvy(c2)))
+  {
+    addMessage(XLAT("Your attack is too weak to break %the1.", c2->monst));
+    addMessage(XLAT("You think you could handle a single leaf."));
+  }
   else if(isWorm(cwt.at->monst) && isWorm(c2->monst) && wormhead(cwt.at) == wormhead(c2) && cwt.at->monst != moTentacleGhost && c2->monst != moTentacleGhost)
     addMessage(XLAT("You cannot attack your own mount!"));
   else if(checkOrb(c2->monst, itOrbShield))
@@ -1159,7 +1162,7 @@ bool pcmove::attack() {
   if(items[itOrbSpeed]&1) attackflags |= AF_FAST;
   if(items[itOrbSlaying]) attackflags |= AF_CRUSH;
   if(items[itCurseWeakness]) attackflags |= AF_WEAK;
-  else if (!c2->stuntime && !isMutantIvy(c2))
+  else if (!c2->stuntime || isIvy(c2) || isMutantIvy(c2))
   {
     if (items[itOrbThorns])
       markOrb(itOrbThorns);

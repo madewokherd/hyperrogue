@@ -78,6 +78,18 @@ EX bool arrow_stuns(eMonster m) {
   return among(m, moCrusher, moMonk, moAltDemon, moHexDemon, moGreater, moGreaterM, moHedge);
   }
 
+bool isIvyStem(cell *c) {
+  if (!isIvy(c) && !isMutantIvy(c))
+    return false;
+
+  for(int i=0; i<c->type; i++)
+    if(c->move(i))
+      if((isIvy(c->move(i)) || isMutantIvy(c->move(i))) && c->move(i)->mondir == c->c.spin(i))
+        return false;
+
+  return true;
+}
+
 EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) {
 
   // cannot eat worms
@@ -93,7 +105,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   
   if(m2 == moPlayer && peace::on) return false;
 
-  if((flags & AF_WEAK) && isIvy(c2)) return false;
+  if((flags & AF_WEAK) && (isIvy(c2) || isMutantIvy(c2)) && !isIvyStem(c2)) return false;
 
   if((flags & AF_MUSTKILL) && attackJustStuns(c2, flags, m1))
     return false;
@@ -428,6 +440,8 @@ EX void stunMonster(cell *c2, eMonster killer, flagtype flags) {
   }
 
 EX bool attackJustStuns(cell *c2, flagtype f, eMonster attacker) {
+  if(isIvy(c2) || isMutantIvy(c2))
+    return false;
   if(f & AF_WEAK)
     return true;
   if(f & AF_HORNS)
