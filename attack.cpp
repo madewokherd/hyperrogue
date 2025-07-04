@@ -95,7 +95,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   // cannot eat worms
   if((flags & AF_EAT) && isWorm(m2)) return false;
 
-  if ((flags & AF_STAB) && m1 == moPlayer && m2 == moMimic) return false;
+  if ((flags & AF_STAB) && m1 == moPlayer && (m2 == moMimic || m2 == moFriendlyIvy)) return false;
   
   if(m1 == passive_switch || m2 == passive_switch) return false;
   
