@@ -1159,7 +1159,7 @@ bool pcmove::attack() {
   if(items[itOrbSpeed]&1) attackflags |= AF_FAST;
   if(items[itOrbSlaying]) attackflags |= AF_CRUSH;
   if(items[itCurseWeakness]) attackflags |= AF_WEAK;
-  else if (!c2->stuntime)
+  else if (!c2->stuntime && !isMutantIvy(c2))
   {
     if (items[itOrbThorns])
       markOrb(itOrbThorns);
