@@ -105,7 +105,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   
   if(m2 == moPlayer && peace::on) return false;
 
-  if((flags & AF_WEAK) && (isIvy(c2) || isMutantIvy(c2)) && !isIvyStem(c2)) return false;
+  if((flags & AF_WEAK) && (isIvy(c2) || isMutantIvy(c2)) && !isIvyStem(c2) && (tkills() || ivy_total().nonzero())) return false;
 
   if((flags & AF_MUSTKILL) && attackJustStuns(c2, flags, m1))
     return false;
