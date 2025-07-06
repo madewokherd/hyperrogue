@@ -1164,9 +1164,8 @@ bool pcmove::attack() {
   if(items[itOrbSpeed]&1) attackflags |= AF_FAST;
   if(items[itOrbSlaying]) attackflags |= AF_CRUSH;
   if(items[itCurseWeakness]) attackflags |= AF_WEAK;
-  if (!c2->stuntime || isIvy(c2) || isMutantIvy(c2))
+  if (bow::weapon == bow::wThorns && (!c2->stuntime || isIvy(c2) || isMutantIvy(c2)))
   {
-    // TODO: Check weapon selection
     if (items[itOrbThorns])
     {
       attackflags |= AF_BASE;
