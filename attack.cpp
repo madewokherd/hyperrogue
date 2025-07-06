@@ -188,6 +188,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
     if(!isMimic(m1))
     if(!checkOrb(m1, itOrbBeauty) && !checkOrb(m1, itOrbAether) && !checkOrb(m1, itOrbShield))
     if(!c1 || !c2 || !withRose(c1,c2))
+    if(!((flags & (AF_STAB|AF_BASE)) == (AF_STAB|AF_BASE) && rosedist(c1) == 1))
       return false;
   
   if(m2 == moFlailer && !c2->stuntime)
@@ -1360,7 +1361,7 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
     if(stabthere && c->wall == waExplosiveBarrel && ((stabFlags & AF_BASE) || markOrb(itOrbThorns)))
       explodeBarrel(c);
     
-    if(stabthere && (items[itOrbThorns] || !out) && canAttack(mt,who,c,c->monst,stabFlags)) {
+    if(stabthere && (items[itOrbThorns] || !out) && canAttack(c->monst == moRoseBeauty ? mf : mt,who,c,c->monst,stabFlags)) {
       changes.ccell(c);
       if(c->monst != moHedge || out) {
         if (!(stabFlags & AF_BASE)) {
