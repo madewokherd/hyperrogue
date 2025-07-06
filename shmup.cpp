@@ -426,26 +426,39 @@ int frontdir() { return WDIM == 2 ? 0 : 2; }
 const int bullet_time = 300;
 
 void shootBullet(monster *m) {
-  monster* bullet = new monster;
-  bullet->base = m->base;
-  bullet->at = m->at;
-  if(WDIM == 3) bullet->at = bullet->at * cpush(2, 0.15 * SCALE);
-  if(gproduct) bullet->ori = m->ori;
-  bullet->type = moBullet;
-  bullet->set_parent(m);
-  bullet->pid = m->pid;
-  bullet->inertia = m->inertia;
-  bullet->inertia[frontdir()] += bullet_velocity(m->type) * SCALE;
-  bullet->hitpoints = 0;
-  bullet->fragoff = curtime + bullet_time;
+  const eItem* orbdir;
 
-  additional.push_back(bullet);
-  
-  eItem orbdir[8] = {
+  const eItem normalOrbdir[8] = {
     itNone, itOrbSide1, itOrbThorns, itOrbSide2, itOrbSide3, itOrbSide2, itOrbThorns, itOrbSide1
     };
-  
-  for(int i=1; i<8; i++) if(markOrb(orbdir[i])) {
+
+  const eItem thornsOrbdir[8] = {
+    itOrbThorns, itOrbSide1, itNone, itOrbSide2, itOrbSide3, itOrbSide2, itNone, itOrbSide1
+    };
+
+  if (bow::weapon == bow::wThorns)
+    orbdir = thornsOrbdir;
+  else
+    orbdir = normalOrbdir;
+
+  if (orbdir[0] == itNone || markOrb(orbdir[0])) {
+    monster* bullet = new monster;
+    bullet->base = m->base;
+    bullet->at = m->at;
+    if(WDIM == 3) bullet->at = bullet->at * cpush(2, 0.15 * SCALE);
+    if(gproduct) bullet->ori = m->ori;
+    bullet->type = moBullet;
+    bullet->set_parent(m);
+    bullet->pid = m->pid;
+    bullet->inertia = m->inertia;
+    bullet->inertia[frontdir()] += bullet_velocity(m->type) * SCALE;
+    bullet->hitpoints = 0;
+    bullet->fragoff = curtime + bullet_time;
+
+    additional.push_back(bullet);
+  }
+
+  for(int i=1; i<8; i++) if(orbdir[i] == itNone || markOrb(orbdir[i])) {
     monster* bullet = new monster;
     bullet->base = m->base;
     bullet->at = m->at * cspin(0, WDIM-1, TAU * i/8);
