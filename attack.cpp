@@ -430,6 +430,9 @@ EX void stunMonster(cell *c2, eMonster killer, flagtype flags) {
   if ((flags & AF_NERF) && newtime > 2)
   {
     newtime = 2;
+
+    eItem o = frog_power(c2->monst);
+    if (o && items[o] < 2) items[o] = 2;
   }
   if(!(flags & (AF_WEAK|AF_NERF)) && !isMetalBeast(c2->monst) && !among(c2->monst, moSkeleton, moReptile, moSalamander, moTortoise, moWorldTurtle, moBrownBug)) {
     c2->hitpoints--;
