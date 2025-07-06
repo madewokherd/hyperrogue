@@ -200,6 +200,7 @@ EX void initgame() {
   if(!safety) {
     firstland = specialland;
     ineligible_starting_land = !landUnlockedIngame(specialland);
+    shuffleOrbsChaos();
     }
 
   if(firstland == laNone || firstland == laBarrier)
