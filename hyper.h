@@ -633,6 +633,8 @@ typedef function<int(struct cell*)> cellfunction;
 #define AF_PSI               Flag(33)   // Orb of the Mind
 #define AF_WEAK              Flag(34)   // Curse of Weakness
 #define AF_BOW               Flag(35)   // crossbow attack
+#define AF_NERF              Flag(36)   // nerfed direct attack with thorns weapon
+#define AF_BASE              Flag(37)   // attack by the player's base weapon
 
 #if CAP_SDL
 

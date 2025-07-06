@@ -946,7 +946,9 @@ void pcmove::tell_why_cannot_attack() {
     addMessage(XLAT("You cannot attack Jellies in their wall form!"));
   else if(c2->monst == moAngryDie)
     addMessage(XLAT("This die is really angry at you!"));
-  else if((attackflags & AF_WEAK) && (isIvy(c2) || isMutantIvy(c2)))
+  else if((attackflags & AF_WEAK) && isIvy(c2))
+    addMessage(XLAT("You are too weakened to attack %the1!", c2->monst));
+  else if((attackflags & AF_NERF) && (isIvy(c2) || isMutantIvy(c2)))
   {
     addMessage(XLAT("Your attack is too weak to break %the1.", c2->monst));
     addMessage(XLAT("You think you could handle a single leaf."));
@@ -1162,12 +1164,16 @@ bool pcmove::attack() {
   if(items[itOrbSpeed]&1) attackflags |= AF_FAST;
   if(items[itOrbSlaying]) attackflags |= AF_CRUSH;
   if(items[itCurseWeakness]) attackflags |= AF_WEAK;
-  else if (!c2->stuntime || isIvy(c2) || isMutantIvy(c2))
+  if (!c2->stuntime || isIvy(c2) || isMutantIvy(c2))
   {
+    // TODO: Check weapon selection
     if (items[itOrbThorns])
+    {
+      attackflags |= AF_BASE;
       markOrb(itOrbThorns);
+    }
     else 
-      attackflags |= AF_WEAK;
+      attackflags |= AF_NERF;
   }
   
   bool ca = bow::crossbow_mode() ? good_tortoise : canAttack(cwt.at, moPlayer, c2, c2->monst, attackflags);

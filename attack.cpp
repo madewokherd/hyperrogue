@@ -95,8 +95,8 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   // cannot eat worms
   if((flags & AF_EAT) && isWorm(m2)) return false;
 
-  if ((flags & AF_STAB) && m1 == moPlayer && (m2 == moMimic || m2 == moFriendlyIvy)) return false;
-  if ((flags & AF_STAB) && m1 == moMimic && m2 == moMimic) return false;
+  if ((flags & AF_BASE) && m1 == moPlayer && (m2 == moMimic || m2 == moFriendlyIvy)) return false;
+  if ((flags & AF_BASE) && m1 == moMimic && m2 == moMimic) return false;
   
   if(m1 == passive_switch || m2 == passive_switch) return false;
   
@@ -106,7 +106,9 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   
   if(m2 == moPlayer && peace::on) return false;
 
-  if((flags & AF_WEAK) && (isIvy(c2) || isMutantIvy(c2)) && !isIvyStem(c2) && (tkills() || ivy_total().nonzero())) return false;
+  if((flags & AF_WEAK) && isIvy(c2)) return false;
+
+  if((flags & AF_NERF) && (isIvy(c2) || isMutantIvy(c2)) && !isIvyStem(c2) && (tkills() || ivy_total().nonzero())) return false;
 
   if((flags & AF_MUSTKILL) && attackJustStuns(c2, flags, m1))
     return false;
@@ -125,6 +127,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   if(among(m2, moAltDemon, moHexDemon, moPair, moCrusher, moNorthPole, moSouthPole, moMonk) && !(flags & (AF_EAT | AF_MAGIC | AF_BULL | AF_CRUSH)))
     return false;
   
+  // FIXME: mark AF_NERF flag on mimic's normal attacks so we can properly prevent mimics from directly attacking enemies
   if((m2 == moHedge || m1 == moMimic) && !(flags & (AF_STAB | AF_TOUGH | AF_EAT | AF_MAGIC | AF_LANCE | AF_SWORD_INTO | AF_HORNS | AF_BULL | AF_CRUSH)))
     if(!checkOrb(m1, itOrbThorns)) return false;
   
@@ -142,7 +145,7 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   if(!(flags & AF_NOSHIELD) && ((flags & AF_NEXTTURN) ? checkOrb2 : checkOrb)(m2, itOrbShield)) return false;
   
   if((flags & AF_STAB) && m2 != moHedge) {
-    if(m1 != moPlayer && m1 != moMimic && !checkOrb(m1, itOrbThorns)) return false;
+    if(!(flags & AF_BASE) && !checkOrb(m1, itOrbThorns)) return false;
     else flags |= AF_IGNORE_UNARMED;
     }
 
@@ -425,12 +428,11 @@ EX void stunMonster(cell *c2, eMonster killer, flagtype flags) {
     ((flags & AF_WEAK) && !attackJustStuns(c2, flags &~ AF_WEAK, killer)) ? min(5+c2->stuntime, 15) :
     3);
   if(killer == moArrowTrap) newtime = min(newtime + 3, 7);
-  if (killer == moPlayer && !(flags & (AF_STAB|AF_BULL|AF_SIDE|AF_HORNS|AF_SWORD|AF_SWORD_INTO|AF_GUN|AF_APPROACH|AF_BACK|AF_LANCE|AF_MAGIC)) &&
-    !items[itOrbThorns] && newtime > 2)
+  if ((flags & AF_NERF) && newtime > 2)
   {
     newtime = 2;
   }
-  if(!(flags & AF_WEAK) && !isMetalBeast(c2->monst) && !among(c2->monst, moSkeleton, moReptile, moSalamander, moTortoise, moWorldTurtle, moBrownBug)) {
+  if(!(flags & (AF_WEAK|AF_NERF)) && !isMetalBeast(c2->monst) && !among(c2->monst, moSkeleton, moReptile, moSalamander, moTortoise, moWorldTurtle, moBrownBug)) {
     c2->hitpoints--;
     if(c2->monst == moPrincess)
       playSound(c2, princessgender() ? "hit-princess" : "hit-prince");
@@ -441,8 +443,8 @@ EX void stunMonster(cell *c2, eMonster killer, flagtype flags) {
   }
 
 EX bool attackJustStuns(cell *c2, flagtype f, eMonster attacker) {
-  if(isIvy(c2) || isMutantIvy(c2))
-    return false;
+  if((f & AF_NERF) && !(isIvy(c2) || isMutantIvy(c2)))
+    return true;
   if(f & AF_WEAK)
     return true;
   if(f & AF_HORNS)
@@ -1318,7 +1320,10 @@ int lastdouble = -3;
 EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
   int numsh = 0, numflail = 0, numlance = 0, numslash = 0, numbb[2];
   flagtype stabFlags = AF_STAB;
-  
+
+  if (who == moPlayer || who == moMimic) // TODO: Make this depend on weapon selection 
+    stabFlags |= AF_BASE;
+
   numbb[0] = numbb[1] = 0;
 
   cell *mf = mi.s;
@@ -1331,10 +1336,15 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
 
   if(peace::on) return;
   bool out = who == moPlayer && bow::crossbow_mode();
-  if (who == moPlayer || (isFriendly(who) && items[itOrbEmpathy]))
+  if (stabFlags & AF_BASE)
   {
-    if (items[itOrbSlaying]) stabFlags |= AF_CRUSH;
-    if (items[itCurseWeakness]) stabFlags |= AF_WEAK;
+    if (who == moPlayer)
+    {
+      if (items[itOrbSlaying]) stabFlags |= AF_CRUSH;
+      if (items[itCurseWeakness]) stabFlags |= AF_WEAK;
+    }
+    if (isFriendly(who) && items[itOrbSlaying] && ((stabFlags & AF_BASE) || items[itOrbEmpathy]))
+      stabFlags |= AF_CRUSH;
   }
   
   for(int t=0; t<mf->type; t++) {
@@ -1345,14 +1355,17 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
     if(logical_adjacent(mt, who, c)) stabthere = true, away = false;
     if(inmirror(c)) c = mirror::reflect(c).at;
 
-    if(stabthere && c->wall == waExplosiveBarrel)
+    if(stabthere && c->wall == waExplosiveBarrel && ((stabFlags & AF_BASE) || markOrb(itOrbThorns)))
       explodeBarrel(c);
     
     if(stabthere && (items[itOrbThorns] || !out) && canAttack(mt,who,c,c->monst,stabFlags)) {
       changes.ccell(c);
       if(c->monst != moHedge || out) {
-        if(who != moPlayer) { markOrb(itOrbThorns); markOrb(itOrbEmpathy); }
+        if (!(stabFlags & AF_BASE)) {
+          markOrb(itOrbThorns);
+          if(who != moPlayer) markOrb(itOrbEmpathy);
         }
+      }
       eMonster m = c->monst;
       int k = tkills();
       if(attackMonster(c, stabFlags | AF_MSG, who))  {
