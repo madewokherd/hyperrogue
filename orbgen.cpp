@@ -77,7 +77,7 @@ struct orbinfo {
   };
 #endif
 
-EX vector<orbinfo> orbinfos = {
+EX vector<orbinfo> orbinfos_default = {
   {orbgenflags::S_NATIVE, laGraveyard, 200, 200,itGreenStone}, // must be first so that it does not reduce 
   {orbgenflags::S_NATIVE, laJungle, 1200, 1500,itOrbLightning},
   {orbgenflags::S_NATIVE, laIce, 2000, 1500,itOrbFlash},
@@ -171,6 +171,8 @@ EX vector<orbinfo> orbinfos = {
   {orbgenflags::S_GUEST, laDice, 750, 0, itOrbAir},
   {orbgenflags::S_NATIVE, laWhirlpool, 0, 2000, itOrbWater}, // needs to be last
   };
+
+EX vector<orbinfo> orbinfos = orbinfos_default;
 
 EX eItem nativeOrbType(eLand l) {
   if(isElemental(l)) l = laElementalWall;
@@ -410,6 +412,44 @@ EX eOrbLandRelation getOLR(eItem it, eLand l) {
   
   return olrPrize25;
   }
+
+EX void shuffleOrbsDefault() {
+  orbinfos = orbinfos_default;
+}
+
+EX bool canShuffleOrb(eItem itemtype) {
+  if (itemclass(itemtype) != IC_ORB) return false;
+  if (classflag(itemtype) & IF_CURSE) return false;
+  if (itemtype == itOrbLove || itemtype == itOrbMirror) return false;
+  return true;
+}
+
+EX void shuffleOrbsChaos() {
+  shuffleOrbsDefault();
+
+  for (unsigned int i = 0; i < orbinfos.size(); i++) {
+    orbinfo &info = orbinfos[i];
+
+    if (!canShuffleOrb(info.orb)) continue;
+
+    eItem candidate;
+
+    while (true) {
+      candidate = (eItem)hrand((int)ittypes);
+
+      if (!canShuffleOrb(candidate)) continue;
+
+      eOrbLandRelation elr = getOLR(candidate, info.l);
+
+      if (elr == olrForbidden || elr == olrDangerous || elr == olrUseless ||
+        elr == olrPNever || elr == olrBurns) continue;
+
+      break;
+    }
+
+    info.orb = candidate;
+  }
+}
 
 EX int orbsUnlocked() {
   int i = 0;
