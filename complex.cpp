@@ -1467,7 +1467,7 @@ EX namespace mirror {
           eMonster m2 = c2->monst;
           if(!peace::on && !bow::crossbow_mode() && canAttack(c,moMimic,c2,m2, 0)) {
 
-            if(items[itOrbEmpathy] && items[itOrbSlaying]) // TODO: Check weapon selection here
+            if(bow::weapon == bow::wBlade || (bow::weapon == bow::wThorns && items[itOrbEmpathy] && items[itOrbThorns]))
             attackMonster(c2, AF_NORMAL | AF_MSG | AF_BASE, moMimic);
             if(!fwd) produceGhost(c2, m2, moMimic);
             sideAttack(c, m.second.spin, m2, 0);

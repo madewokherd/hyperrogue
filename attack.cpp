@@ -127,7 +127,6 @@ EX bool canAttack(cell *c1, eMonster m1, cell *c2, eMonster m2, flagtype flags) 
   if(among(m2, moAltDemon, moHexDemon, moPair, moCrusher, moNorthPole, moSouthPole, moMonk) && !(flags & (AF_EAT | AF_MAGIC | AF_BULL | AF_CRUSH)))
     return false;
   
-  // FIXME: mark AF_NERF flag on mimic's normal attacks so we can properly prevent mimics from directly attacking enemies
   if((m2 == moHedge || m1 == moMimic) && !(flags & (AF_STAB | AF_TOUGH | AF_EAT | AF_MAGIC | AF_LANCE | AF_SWORD_INTO | AF_HORNS | AF_BULL | AF_CRUSH)))
     if(!checkOrb(m1, itOrbThorns)) return false;
   
@@ -1321,7 +1320,7 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
   int numsh = 0, numflail = 0, numlance = 0, numslash = 0, numbb[2];
   flagtype stabFlags = AF_STAB;
 
-  if (who == moPlayer || who == moMimic) // TODO: Make this depend on weapon selection 
+  if (bow::weapon == bow::wThorns && (who == moPlayer || who == moMimic))
     stabFlags |= AF_BASE;
 
   numbb[0] = numbb[1] = 0;
