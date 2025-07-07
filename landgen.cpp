@@ -2193,7 +2193,7 @@ EX void giantLandSwitch(cell *c, int d, cell *from) {
           if(hrand_monster(15000) < 10 + 2 * items[itCoast] + 2 * yendor::hardness())
             c->monst = moAlbatross;
           if(items[itCoast] >= treasureForLocal() && hrand(10000) < 5 && !peace::on && !inv::on)
-            c->item = itOrbAir;
+            c->item = guestOrbType(laOcean);
           else placeLocalSpecial(c, 10000, 6, 5);
           buildPrizeMirror(c, 2000);
           }
