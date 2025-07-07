@@ -1635,7 +1635,7 @@ EX void giantLandSwitch(cell *c, int d, cell *from) {
           else if(hrand(5000) < 250 && !peace::on)
             c->item = itGrimoire;
           else if(hrand(5000) < 10 && (ls::any_chaos() ? items[itGrimoire] >= treasureForLocal() : -d > temple_layer_size() * 10) && !peace::on && !inv::on)
-            c->item = itOrbDragon;
+            c->item = nativeOrbType(laTemple);
           }
         }
       break;
