@@ -81,6 +81,8 @@ EX bool usedSafety = false;
 EX eLand safetyland;
 EX int safetyseed;
 
+EX int gameseed;
+
 EX bool childbug = false;
 
 /** Is `w` killed if the part of an ivy `killed` is killed? */
