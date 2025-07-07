@@ -431,6 +431,16 @@ EX bool canShuffleOrb(eItem itemtype) {
   return true;
 }
 
+EX bool canPlaceInLand(eItem itemtype, eLand l) {
+  if (l == laPalace) l = laPrincessQuest;
+
+  eOrbLandRelation elr = getOLR(itemtype, l);
+  if (elr == olrForbidden || elr == olrDangerous || elr == olrUseless ||
+    elr == olrPNever || elr == olrBurns) return false;
+
+  return true;
+}
+
 EX void shuffleOrbsChaos() {
   shuffleOrbsDefault();
 
@@ -447,10 +457,7 @@ EX void shuffleOrbsChaos() {
 
       if (!canShuffleOrb(candidate)) continue;
 
-      eOrbLandRelation elr = getOLR(candidate, info.l);
-
-      if (elr == olrForbidden || elr == olrDangerous || elr == olrUseless ||
-        elr == olrPNever || elr == olrBurns) continue;
+      if (!canPlaceInLand(candidate, info.l)) continue;
 
       break;
     }
