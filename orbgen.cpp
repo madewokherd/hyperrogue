@@ -185,6 +185,13 @@ EX eItem nativeOrbType(eLand l) {
   return itNone;
   }
 
+EX eItem guestOrbType(eLand l) {
+  for(auto& oi: orbinfos)
+    if(oi.l == l && (oi.flags & orbgenflags::GUEST))
+      return oi.orb;
+  return itNone;
+  }
+
 const orbinfo& getNativityOrbInfo(eItem orb) {
   for(auto& oi: orbinfos)
     if(oi.orb == orb && oi.is_native())

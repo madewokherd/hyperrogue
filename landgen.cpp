@@ -588,7 +588,7 @@ EX void giantLandSwitch(cell *c, int d, cell *from) {
           c->wall != waOpenGate && !lookingForPrincess0)
           c->item = itPalace;
         if(items[itPalace] >= treasureForLocal() && hrand(5000) < 16 && c->wall != waOpenGate && !inv::on && !peace::on)
-          c->item = hrand(100) < 80 ? itOrbFrog : itOrbDiscord;
+          c->item = hrand(100) < 80 ? guestOrbType(laPalace) : nativeOrbType(laPalace);
         if(hrand(5000) < 20*PRIZEMUL && c->wall != waOpenGate)
           placePrizeOrb(c);
         if(c->wall == waNone && buildPrizeMirror(c, 250)) {}
