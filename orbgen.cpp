@@ -434,8 +434,9 @@ EX bool canShuffleOrb(eItem itemtype) {
 EX void shuffleOrbsChaos() {
   shuffleOrbsDefault();
 
-  for (unsigned int i = 0; i < orbinfos.size(); i++) {
-    orbinfo &info = orbinfos[i];
+  vector<orbinfo> new_orbinfos = orbinfos_default;
+  for (unsigned int i = 0; i < new_orbinfos.size(); i++) {
+    orbinfo &info = new_orbinfos[i];
 
     if (!canShuffleOrb(info.orb)) continue;
 
@@ -456,6 +457,8 @@ EX void shuffleOrbsChaos() {
 
     info.orb = candidate;
   }
+
+  orbinfos = new_orbinfos;
 }
 
 EX int orbsUnlocked() {
