@@ -200,7 +200,6 @@ EX void initgame() {
   if(!safety) {
     firstland = specialland;
     ineligible_starting_land = !landUnlockedIngame(specialland);
-    shuffleOrbsChaos();
     }
 
   if(firstland == laNone || firstland == laBarrier)
@@ -469,7 +468,7 @@ EX namespace scores {
 /** \brief the amount of boxes reserved for each hr::score item */
 #define MAXBOX 500
 /** \brief currently used boxes in hr::score */
-#define POSSCORE 421
+#define POSSCORE 422
 /** \brief a struct to keep local score from an earlier game */
 struct score {
   /** \brief version used */
@@ -986,6 +985,7 @@ EX void applyBoxes() {
   applyBoxNum(loadcount, "load count");
   applyBoxNum(load_branching, "load branching");
   applyBoxNum(current_loadcount, "current load count");
+  applyBoxNum(gameseed, "@gameseed");
 
   if(POSSCORE != boxid) printf("ERROR: %d boxes\n", boxid);
   if(isize(invorb)) { println(hlog, "ERROR: Orbs not taken into account"); exit(1); }
@@ -1421,6 +1421,9 @@ EX void load_last_save() {
   save_turns = turncount;
   loaded_from_save = true;
 
+  shrand(gameseed);
+  shufflegame();
+
   if(loadcount >= 0) {
     loadcount += current_loadcount;
     load_branching += BRANCH_SCALE * log(1 + current_loadcount);
@@ -1678,6 +1681,21 @@ EX void switch_game_mode(char switchWhat) {
     }
   }
 
+EX void shufflegame() {
+  if(randomPatternsMode) {
+    for(int i=0; i<landtypes; i++) {
+      randompattern[i] = hrandpos();
+      // change probability 1/5 to 2/6
+      if(hrand(5) == 0) {
+        randompattern[i] -= (randompattern[i] % 5);
+        }
+      }
+    if(randomPatternsMode) specialland = pickLandRPM(laNone);
+    clearMemoRPM();
+    }
+  shuffleOrbsChaos();
+}
+
 EX void start_game() {
   if(game_active) return;
   DEBBI(DF_INIT, ("start_game"));
@@ -1696,18 +1714,6 @@ EX void start_game() {
   initcells();
   get_expansion().reset();
   init_disk_cells();
-
-  if(randomPatternsMode) {
-    for(int i=0; i<landtypes; i++) {
-      randompattern[i] = hrandpos();
-      // change probability 1/5 to 2/6
-      if(hrand(5) == 0) {
-        randompattern[i] -= (randompattern[i] % 5);
-        }
-      }
-    if(randomPatternsMode) specialland = pickLandRPM(laNone);
-    clearMemoRPM();
-    }
 
   initgame();
   if(gamegen_failure) {
@@ -1729,6 +1735,9 @@ EX void start_game() {
 EX void restart_game(char switchWhat IS(rg::nothing)) {
   popScreenAll();
   stop_game_and_switch_mode(switchWhat);
+  gameseed = hrandpos();
+  shrand(gameseed);
+  shufflegame();
   start_game();
   }
 
@@ -1812,6 +1821,10 @@ EX void initAll() {
 #endif
   srand(time(NULL));
   shrand(fixseed ? startseed : time(NULL));
+
+  gameseed = hrandpos();
+  shrand(gameseed);
+  shufflegame();
 
   firstland0 = firstland;
 
@@ -1919,6 +1932,9 @@ EX void load_mode_from_file(const string& fname) {
   stop_game();
   load_mode_data_with_zero(ss);
   if(custom_name != "") { modecode(); update_modename(custom_name); }
+  gameseed = hrandpos();
+  shrand(gameseed);
+  shufflegame();
   start_game();
   }
 
