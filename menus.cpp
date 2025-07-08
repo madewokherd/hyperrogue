@@ -776,6 +776,9 @@ EX void showChangeMode() {
   dialog::addBoolItem(XLAT("Orb Strategy mode"), (inv::on), 'i');
   dialog::add_action_confirmed([] { restart_game(rg::inv); });
 
+  dialog::addBoolItem(XLAT("orb shuffle"), orbShuffle, 'o');
+  dialog::add_action_push(showOrbShuffleMenu);
+
   dialog::addBoolItem(XLAT("random pattern mode"), (randomPatternsMode), 'r');
   dialog::add_action_confirmed([] { 
     stop_game();
