@@ -1789,6 +1789,16 @@ EX void initConfig() {
   for(auto s: params) s.second->reset();
 #endif
 
+  param_enum(orbShuffle, "orb_shuffle", orbShuffle)
+    -> editable({{"default", "Do not shuffle orbs."},
+      {"chaos", "Native and secondary orbs for most lands changed randomly. Orbs may be duplicated or missing."}},
+      "orb shuffle", 'o')
+    -> set_need_confirm()
+    -> set_value_to = [] (orbShuffleMode shuf) { bool b = game_active; if(shuf != orbShuffle) stop_game(); orbShuffle = shuf;
+      peace::on = false; if(multi::players > 1) multi::players = 1;
+      if(b) start_game();
+      };
+
   param_custom_int(sightrange_bonus, "sightrange_bonus", menuitem_sightrange_bonus, 'r');
   param_custom_int(vid.use_smart_range, "sightrange_style", menuitem_sightrange_style, 's');
   
@@ -1825,7 +1835,7 @@ EX bool inSpecialMode() {
   #if CAP_TOUR
     tour::on ||
   #endif
-    yendor::on || tactic::on || randomPatternsMode ||
+    yendor::on || tactic::on || randomPatternsMode || orbShuffle != osVanilla ||
     geometry != gNormal || pmodel != mdDisk || pconf.alpha != 1 || pconf.scale != 1 || 
     rug::rugged || vid.monmode != DEFAULT_MONMODE ||
     vid.wallmode != DEFAULT_WALLMODE;
@@ -1844,6 +1854,7 @@ EX bool have_current_settings() {
   if(yendor::on) modecount += 10;
   if(tactic::on) modecount += 10;
   if(randomPatternsMode) modecount += 10;
+  if(orbShuffle != osVanilla) modecount += 10;
   if(geometry != gNormal) modecount += 10;
 
   if(modecount > 1)
@@ -1897,6 +1908,9 @@ EX void resetModes(char leave IS('c')) {
   if(yendor::on != (leave == rg::yendor)) stop_game_and_switch_mode(rg::yendor);
   if(tactic::on != (leave == rg::tactic)) stop_game_and_switch_mode(rg::tactic);
   if(randomPatternsMode != (leave == rg::randpattern)) stop_game_and_switch_mode(rg::randpattern);
+  if (orbShuffle != osVanilla) {
+    stop_game_and_switch_mode(); orbShuffle = osVanilla;
+  }
   if(multi::players != 1) {
     stop_game_and_switch_mode(); multi::players = 1;
     }

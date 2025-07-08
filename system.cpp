@@ -1693,13 +1693,27 @@ EX void shufflegame() {
     if(randomPatternsMode) specialland = pickLandRPM(laNone);
     clearMemoRPM();
     }
-  shuffleOrbsChaos();
+  switch (orbShuffle) {
+  case osVanilla:
+    shuffleOrbsDefault();
+    break;
+  case osChaos:
+    shuffleOrbsChaos();
+    break;
+  }
 }
 
 EX void start_game() {
   if(game_active) return;
   DEBBI(DF_INIT, ("start_game"));
   if(dual::state == 1) dual::assign_landsides();
+
+  if (!gameseed) {
+    gameseed = hrandpos();
+    shrand(gameseed);
+    shufflegame();
+  }
+
   if(dual::split(start_game)) return;
   restart:
   game_active = true;
@@ -1735,9 +1749,6 @@ EX void start_game() {
 EX void restart_game(char switchWhat IS(rg::nothing)) {
   popScreenAll();
   stop_game_and_switch_mode(switchWhat);
-  gameseed = hrandpos();
-  shrand(gameseed);
-  shufflegame();
   start_game();
   }
 
@@ -1821,10 +1832,6 @@ EX void initAll() {
 #endif
   srand(time(NULL));
   shrand(fixseed ? startseed : time(NULL));
-
-  gameseed = hrandpos();
-  shrand(gameseed);
-  shufflegame();
 
   firstland0 = firstland;
 
@@ -1932,9 +1939,6 @@ EX void load_mode_from_file(const string& fname) {
   stop_game();
   load_mode_data_with_zero(ss);
   if(custom_name != "") { modecode(); update_modename(custom_name); }
-  gameseed = hrandpos();
-  shrand(gameseed);
-  shufflegame();
   start_game();
   }
 
@@ -1954,6 +1958,7 @@ auto cgm = addHook(hooks_clearmemory, 40, [] () {
   bow::bowpath.clear();
   bow::clear_bowpath();
   bow::fire_mode = false;
+  gameseed = 0;
   for(auto &am: adj_memo) am.clear();
   }) +
 addHook(hooks_gamedata, 0, [] (gamedata* gd) {
