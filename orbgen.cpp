@@ -33,6 +33,15 @@ enum eOrbLandRelation {
 #endif
 
 #if HDR
+enum orbShuffleMode {
+  osVanilla,
+  osChaos
+};
+#endif
+
+EX orbShuffleMode orbShuffle;
+
+#if HDR
 namespace orbgenflags {
   // generates in the given land from 10 treasures, in the classic mode
   static constexpr int LOCAL10 = 1;
@@ -467,6 +476,16 @@ EX void shuffleOrbsChaos() {
 
   orbinfos = new_orbinfos;
 }
+
+EX void showOrbShuffleMenu() {
+  cmode = sm::SIDE | sm::MAYDARK;
+  gamescreen();
+  dialog::init(XLAT("orb shuffle"));
+  add_edit(orbShuffle);
+  dialog::addBreak(200);
+  dialog::addBack();
+  dialog::display();
+  }
 
 EX int orbsUnlocked() {
   int i = 0;
