@@ -1374,6 +1374,8 @@ EX void stabbingAttack(movei mi, eMonster who, int bonuskill IS(0)) {
       if(attackMonster(c, stabFlags | AF_MSG, who))  {
         spread_plague(mt, c, t, who);
         produceGhost(c, m, who);
+        if ((stabFlags & AF_BASE) && who == moPlayer && m == moRusalka)
+          rusalka_curse();
         }
       if(tkills() > k) numsh++;
       }
