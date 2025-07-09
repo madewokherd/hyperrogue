@@ -183,6 +183,69 @@ EX vector<orbinfo> orbinfos_default = {
 
 EX vector<orbinfo> orbinfos = orbinfos_default;
 
+EX vector<orbinfo> orbs_to_place = {
+  {orbgenflags::S_NATIVE, laNone, 200, 200,itGreenStone},
+  {orbgenflags::S_NATIVE, laNone, 1200, 1500,itOrbLightning},
+  {orbgenflags::S_NATIVE, laNone, 2000, 1500,itOrbFlash},
+  {orbgenflags::S_NATIVE, laNone, 1800, 2000,itOrbLife},
+  {orbgenflags::S_NATIVE, laNone, 800, 800,itOrbSpeed},
+  {orbgenflags::S_NATIVE, laNone, 2500, 1500,itOrbShield},
+  {orbgenflags::S_NATIVE, laNone, 1500, 1500,itOrbTeleport},
+  {orbgenflags::S_NA_O25, laNone, 2000, 700, itOrbSafety},    
+  {orbgenflags::S_NATIVE, laNone, 1500, 1500, itOrbMorph}, 
+  {orbgenflags::S_NATIVE, laNone, 500, 4500, itOrbThorns},
+  {orbgenflags::S_NAT_NT, laNone, 1800, 1500, itOrbDigging},
+  {orbgenflags::S_NATIVE, laNone, 1500, 3500, itOrbPsi},
+  {orbgenflags::S_NATIVE, laNone, 900, 1200, itOrbAether},
+  {orbgenflags::S_NATIVE, laNone, 800, 1200, itOrbInvis},
+  {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbFriend},
+  {orbgenflags::S_NATIVE, laNone, 0, 3000, itOrbDragon},
+  {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbTime},
+  {orbgenflags::S_NATIVE, laNone, 0, 2500, itOrbSpace},
+  {orbgenflags::S_NATIVE, laNone, 1000, 1500, itOrbIllusion},
+  {orbgenflags::S_NATIVE, laNone, 0, 1500, itOrbEmpathy},
+  {orbgenflags::S_NATIVE, laNone, 0, 4000, itOrbDiscord},
+  {orbgenflags::S_NATIVE, laNone, 500, 2100, itOrbFrog},
+  {orbgenflags::S_NAT_NT, laNone, 0, 1800, itOrbFish},
+  {orbgenflags::S_NATIVE, laNone, 500, 4000, itOrbMatter},
+  {orbgenflags::S_NAT_NT, laNone, 1500, 4000, itOrbSummon},
+  {orbgenflags::S_NATIVE, laNone, 1000, 2500, itOrbStunning},
+  {orbgenflags::S_NATIVE, laNone, 1000, 800, itOrbWoods},
+  {orbgenflags::S_NATIVE, laNone, 1250, 3000, itOrbAir},
+  {orbgenflags::S_NATIVE, laNone, 1000, 5000, itOrbUndeath},
+  {orbgenflags::S_NATIVE, laNone, 5000, 5000, itOrbFreedom},
+  {orbgenflags::S_NATIVE, laNone, 2000, 8000, itOrbBeauty},
+  {orbgenflags::S_NATIVE, laNone, 2000, 8000, itOrb37},
+  {orbgenflags::S_NATIVE, laNone, 500, 5000, itOrbDomination},
+  {orbgenflags::S_NATIVE, laNone, 2500, 1500, itOrbShell},
+  {orbgenflags::S_NATIVE, laNone, 150, 2500, itOrbEnergy},
+  {orbgenflags::S_NATIVE, laNone, 500, 2500, itOrbSword},
+  {orbgenflags::S_NATIVE, laNone, 500, 2500, itOrbSword2},
+  {orbgenflags::S_NATIVE, laNone, 750, 1800, itOrbStone},
+  {orbgenflags::S_NATIVE, laNone, 400, 3500, itOrbNature},
+  {orbgenflags::S_NATIVE, laNone, 120, 2500, itOrbRecall},
+  {orbgenflags::S_NATIVE, laNone, 500, 2100, itOrbDash},
+  {orbgenflags::S_NATIVE, laNone, 720, 3000, itOrbHorns},
+  {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbBull},
+  {orbgenflags::S_NATIVE, laNone, 0, 7000, itOrbLava},
+  {orbgenflags::S_NATIVE, laNone, 0, 2500, itOrbSide3},
+  {orbgenflags::S_NATIVE, laNone, 0, 2000, itOrbWinter},
+  {orbgenflags::S_NATIVE, laNone, 800, 2500, itOrbSide1},
+  {orbgenflags::S_NATIVE, laNone, 600, 2500, itOrbSide2},
+  {orbgenflags::S_NATIVE, laNone, 2000, 3000, itOrbPhasing}, 
+  {orbgenflags::S_NATIVE, laNone, 2000, 3000, itOrbMagnetism},
+  {orbgenflags::S_NATIVE, laNone, 1200, 2500, itOrbSlaying},
+  {orbgenflags::S_NATIVE, laNone, 2000, 4200, itOrbGravity},
+  {orbgenflags::S_NATIVE, laNone, 900, 4200, itOrbIntensity},
+  {orbgenflags::S_NATIVE, laNone, 900, 4200, itOrbChoice},
+  {orbgenflags::S_NATIVE, laNone, 1000, 1500, itOrbImpact},
+  {orbgenflags::S_NATIVE, laNone, 1000, 1000, itOrbChaos},
+  {orbgenflags::S_NATIVE, laNone, 800, 2500, itOrbPlague},
+  {orbgenflags::S_NATIVE, laNone, 400, 1500, itOrbPurity},
+  {orbgenflags::S_NAT_NT, laNone, 500, 800, itOrbLuck},
+  {orbgenflags::S_NATIVE, laNone, 0, 2000, itOrbWater},
+  };
+
 EX eItem nativeOrbType(eLand l) {
   if(isElemental(l)) l = laElementalWall;
   if(inv::on && (l == laMirror || l == laMirrorOld || isCrossroads(l)))
@@ -434,8 +497,7 @@ EX void shuffleOrbsDefault() {
 }
 
 EX bool canShuffleOrb(eItem itemtype) {
-  if (itemclass(itemtype) != IC_ORB) return false;
-  if (classflag(itemtype) & IF_CURSE) return false;
+  if (itemclass(itemtype) != IC_ORB && itemtype != itGreenStone) return false;
   if (itemtype == itOrbLove || itemtype == itOrbMirror) return false;
   return true;
 }
@@ -459,19 +521,16 @@ EX void shuffleOrbsChaos() {
 
     if (!canShuffleOrb(info.orb)) continue;
 
-    eItem candidate;
+    orbinfo candidate;
 
     while (true) {
-      candidate = (eItem)hrand((int)ittypes);
-
-      if (!canShuffleOrb(candidate)) continue;
-
-      if (!canPlaceInLand(candidate, info.l)) continue;
-
+      candidate = orbs_to_place[hrand(orbs_to_place.size())];
+      if (!canPlaceInLand(candidate.orb, info.l)) continue;
       break;
     }
 
-    info.orb = candidate;
+    info.orb = candidate.orb;
+    info.gchance = candidate.gchance;
   }
 
   orbinfos = new_orbinfos;
