@@ -1791,7 +1791,8 @@ EX void initConfig() {
 
   param_enum(orbShuffle, "orb_shuffle", orbShuffle)
     -> editable({{"default", "Do not shuffle orbs."},
-      {"chaos", "Native and secondary orbs for most lands changed randomly. Orbs may be duplicated or missing."}},
+      {"chaos", "Native and secondary orbs for most lands changed randomly. Orbs may be duplicated or missing."},
+      {"full", "Native orbs shuffled. Duplicates and missing orbs will be kept to a minimum."}},
       "orb shuffle", 'o')
     -> set_need_confirm()
     -> set_value_to = [] (orbShuffleMode shuf) { bool b = game_active; if(shuf != orbShuffle) stop_game(); orbShuffle = shuf;

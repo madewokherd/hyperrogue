@@ -1700,6 +1700,9 @@ EX void shufflegame() {
   case osChaos:
     shuffleOrbsChaos();
     break;
+  case osFull:
+    shuffleOrbsFull();
+    break;
   }
 }
 
