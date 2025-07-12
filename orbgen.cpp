@@ -526,8 +526,12 @@ EX void shuffleOrbsFull() {
 
     if (!canShuffleOrb(i.orb)) continue;
 
-    lands_to_assign.push_back(i.l);
+    if (i.l != laVolcano)
+      lands_to_assign.push_back(i.l);
   }
+
+  if (isLandIngame(laVolcano))
+    lands_to_assign.push_back(laVolcano); // Only a few orbs can go here, so place it first
 
   orbs_to_assign = orbs_to_place;
 
