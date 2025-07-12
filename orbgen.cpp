@@ -35,7 +35,8 @@ enum eOrbLandRelation {
 #if HDR
 enum orbShuffleMode {
   osVanilla,
-  osChaos
+  osChaos,
+  osFull
 };
 #endif
 
@@ -510,6 +511,96 @@ EX bool canPlaceInLand(eItem itemtype, eLand l) {
     elr == olrPNever || elr == olrBurns) return false;
 
   return true;
+}
+
+EX void shuffleOrbsFull() {
+  shuffleOrbsDefault();
+
+  vector<eLand> lands_to_assign;
+  vector<orbinfo> orbs_to_assign;
+
+  for (const orbinfo &i: orbinfos_default) {
+    if (!i.is_native()) continue;
+
+    if (!isLandIngame(i.l)) continue;
+
+    if (!canShuffleOrb(i.orb)) continue;
+
+    lands_to_assign.push_back(i.l);
+  }
+
+  orbs_to_assign = orbs_to_place;
+
+  while (lands_to_assign.size() > orbs_to_assign.size())
+  {
+    for (orbinfo i: orbinfos_default) {
+      i.flags |= orbgenflags::GUEST; // marker indicating we shouldn't assign this to laNone
+      orbs_to_assign.push_back(i);
+    }
+  }
+
+  while (orbs_to_assign.size() > lands_to_assign.size())
+  {
+    lands_to_assign.push_back(laNone);
+  }
+
+  vector<pair<eLand, orbinfo>> assignments;
+
+  int num_candidates = orbs_to_assign.size();
+
+  while (lands_to_assign.size()) {
+    auto land_to_assign = lands_to_assign[lands_to_assign.size()-1];
+    lands_to_assign.pop_back();
+
+    // Choose an orb and remove from list
+    int orbinfo_candidate_idx = hrand(num_candidates);
+    auto orbinfo_candidate = orbs_to_assign[orbinfo_candidate_idx];
+    orbs_to_assign[orbinfo_candidate_idx] = orbs_to_assign[orbs_to_assign.size()-1];
+    orbs_to_assign.pop_back();
+
+    if (land_to_assign == laNone
+        ? !(orbinfo_candidate.flags & orbgenflags::GUEST)
+        : canPlaceInLand(orbinfo_candidate.orb, land_to_assign)) {
+      assignments.push_back(make_pair(land_to_assign, orbinfo_candidate));
+      num_candidates = orbs_to_assign.size();
+    }
+    else if (hrand(num_candidates) > 0) {
+      // keep trying
+      orbs_to_assign.push_back(orbinfo_candidate);
+      lands_to_assign.push_back(land_to_assign);
+      num_candidates--;
+    }
+    else {
+      // backtrack
+      int p = num_candidates;
+      while (assignments.size()) {
+        auto undo_pair = assignments[assignments.size()-1];
+        assignments.pop_back();
+        lands_to_assign.push_back(undo_pair.first);
+        orbs_to_assign.push_back(undo_pair.second);
+
+        p = p * (orbs_to_assign.size() + 1);
+        if (hrand(p) != 0) break;
+      }
+
+      lands_to_assign.push_back(land_to_assign);
+      orbs_to_assign.push_back(orbinfo_candidate);
+      num_candidates = orbs_to_assign.size();
+    }
+  }
+
+  vector<orbinfo> new_orbinfos = orbinfos_default;
+  for (pair<eLand, orbinfo> assignment: assignments) {
+    if (assignment.first == laNone) continue;
+    for (orbinfo &info: new_orbinfos) {
+      if (info.l == assignment.first && info.is_native()) {
+        info.orb = assignment.second.orb;
+        info.gchance = assignment.second.gchance;
+        break;
+      }
+    }
+  }
+  orbinfos = new_orbinfos;
 }
 
 EX void shuffleOrbsChaos() {
