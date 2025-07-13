@@ -556,7 +556,6 @@ EX void shuffleOrbsFull() {
     auto land_to_assign = lands_to_assign[lands_to_assign.size()-1];
     lands_to_assign.pop_back();
 
-    // Choose an orb and remove from list
     int orbinfo_candidate_idx = hrand(num_candidates);
     auto orbinfo_candidate = orbs_to_assign[orbinfo_candidate_idx];
     orbs_to_assign[orbinfo_candidate_idx] = orbs_to_assign[orbs_to_assign.size()-1];
@@ -568,23 +567,12 @@ EX void shuffleOrbsFull() {
       assignments.push_back(make_pair(land_to_assign, orbinfo_candidate));
       num_candidates = orbs_to_assign.size();
     }
-    else if (hrand(num_candidates) > 0) {
-      // keep trying
-      orbs_to_assign.push_back(orbinfo_candidate);
-      lands_to_assign.push_back(land_to_assign);
-      num_candidates--;
-    }
     else {
-      // backtrack
-      int p = num_candidates;
       while (assignments.size()) {
         auto undo_pair = assignments[assignments.size()-1];
         assignments.pop_back();
         lands_to_assign.push_back(undo_pair.first);
         orbs_to_assign.push_back(undo_pair.second);
-
-        p = p * (orbs_to_assign.size() + 1);
-        if (hrand(p) != 0) break;
       }
 
       lands_to_assign.push_back(land_to_assign);
