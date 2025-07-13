@@ -540,28 +540,31 @@ EX void shuffleOrbsFull() {
 
   orbs_to_assign = orbs_to_place;
 
-  while (lands_to_assign.size() > orbs_to_assign.size())
-  {
-    for (orbinfo i: orbinfos_default) {
-      i.flags |= orbgenflags::GUEST; // marker indicating we shouldn't assign this to laNone
-      orbs_to_assign.push_back(i);
-    }
-  }
-
-  while (orbs_to_assign.size() > lands_to_assign.size())
-  {
-    lands_to_assign.push_back(laNone);
-  }
-
   vector<pair<eLand, orbinfo>> assignments;
 
-  int num_candidates = orbs_to_assign.size();
-
   while (lands_to_assign.size()) {
+    if (lands_to_assign.size() > orbs_to_assign.size())
+    {
+      while (orbs_to_assign.size() + orbs_to_place.size() <= lands_to_assign.size())
+      {
+        for (orbinfo i: orbs_to_place) {
+          orbs_to_assign.push_back(i);
+        }
+      }
+      vector<orbinfo> extra_orbs = orbs_to_place;
+      while (orbs_to_assign.size() < lands_to_assign.size())
+      {
+        int orb_idx = hrand(extra_orbs.size());
+        orbs_to_assign.push_back(extra_orbs[orb_idx]);
+        extra_orbs[orb_idx] = extra_orbs[extra_orbs.size() - 1];
+        extra_orbs.pop_back();
+      }
+    }
+
     auto land_to_assign = lands_to_assign[lands_to_assign.size()-1];
     lands_to_assign.pop_back();
 
-    int orbinfo_candidate_idx = hrand(num_candidates);
+    int orbinfo_candidate_idx = hrand(orbs_to_assign.size());
     auto orbinfo_candidate = orbs_to_assign[orbinfo_candidate_idx];
     orbs_to_assign[orbinfo_candidate_idx] = orbs_to_assign[orbs_to_assign.size()-1];
     orbs_to_assign.pop_back();
@@ -570,19 +573,16 @@ EX void shuffleOrbsFull() {
         ? !(orbinfo_candidate.flags & orbgenflags::GUEST)
         : canPlaceInLand(orbinfo_candidate.orb, land_to_assign)) {
       assignments.push_back(make_pair(land_to_assign, orbinfo_candidate));
-      num_candidates = orbs_to_assign.size();
     }
     else {
       while (assignments.size()) {
         auto undo_pair = assignments[assignments.size()-1];
         assignments.pop_back();
         lands_to_assign.push_back(undo_pair.first);
-        orbs_to_assign.push_back(undo_pair.second);
       }
 
       lands_to_assign.push_back(land_to_assign);
-      orbs_to_assign.push_back(orbinfo_candidate);
-      num_candidates = orbs_to_assign.size();
+      orbs_to_assign = orbs_to_place;
     }
   }
 
