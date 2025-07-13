@@ -510,12 +510,14 @@ EX string generateHelpForItem(eItem it) {
 
   if(itemclass(it) == IC_ORB || it == itGreenStone || it == itOrbYendor) {
     for(auto& oi: orbinfos) {
-      if(oi.orb == it && oi.is_native()) describeOrb(help, oi);
+      if(oi.orb == itNone) continue;
+      if(oi.orb == it && oi.is_native() && isLandIngame(oi.l)) describeOrb(help, oi);
       }
     }
   
   if(itemclass(it) == IC_TREASURE) {
     for(auto& oi: orbinfos) {
+      if(oi.orb == itNone) continue;
       if(treasureType(oi.l) == it) {
         if(oi.gchance > 0) {
           help += "\n\n";

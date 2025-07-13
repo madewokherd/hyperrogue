@@ -117,6 +117,8 @@ EX vector<orbinfo> orbinfos_default = {
   {orbgenflags::S_NATIVE, laCamelot, 1000, 1500, itOrbIllusion},
   {orbgenflags::S_NATIVE, laOcean, 0, 1500, itOrbEmpathy},
   {orbgenflags::S_GUEST,  laOcean, 0, 0, itOrbAir},
+  {orbgenflags::S_NATIVE, laCrossroads, 1500, 1500, itNone},
+  {orbgenflags::S_NATIVE, laWildWest, 1500, 1500, itNone},
   {orbgenflags::S_NATIVE, laPalace, 0, 4000, itOrbDiscord},
   {orbgenflags::S_GUEST,  laPalace, 0, 0, itOrbFrog},
   {orbgenflags::S_NATIVE, laZebra, 500, 2100, itOrbFrog},
@@ -150,7 +152,9 @@ EX vector<orbinfo> orbinfos_default = {
   {orbgenflags::S_NATIVE, laBlizzard, 0, 2000, itOrbWinter},
   {orbgenflags::S_NATIVE, laTerracotta, 800, 2500, itOrbSide1},
   {orbgenflags::S_NATIVE, laDual, 600, 2500, itOrbSide2},
+  {orbgenflags::S_NATIVE, laSnakeNest, 2000, 5000, itNone},
   {orbgenflags::S_GUEST, laSnakeNest, 2000, 0, itOrbDomination},
+  {orbgenflags::S_NATIVE, laDocks, 1000, 5000, itNone},
   {orbgenflags::S_GUEST, laDocks, 3000, 0, itOrbFish},
   {orbgenflags::S_GUEST, laDocks, 3000, 0, itOrbDragon},
   {orbgenflags::S_GUEST, laDocks, 3000, 0, itOrbDash},
@@ -251,6 +255,7 @@ EX eItem nativeOrbType(eLand l) {
   if(isElemental(l)) l = laElementalWall;
   if(inv::on && (l == laMirror || l == laMirrorOld || isCrossroads(l)))
     return itOrbMirror;
+  if(isCrossroads(l)) l = laCrossroads;
   if(l == laMirror || l == laMirrorOld) return itShard;
   for(auto& oi: orbinfos)
     if(oi.l == l && oi.is_native())
@@ -498,7 +503,7 @@ EX void shuffleOrbsDefault() {
 }
 
 EX bool canShuffleOrb(eItem itemtype) {
-  if (itemclass(itemtype) != IC_ORB && itemtype != itGreenStone) return false;
+  if (itemclass(itemtype) != IC_ORB && itemtype != itGreenStone && itemtype != itNone) return false;
   if (itemtype == itOrbLove || itemtype == itOrbMirror) return false;
   return true;
 }
@@ -689,6 +694,7 @@ EX void placePrizeOrb(cell *c) {
   if(l == laElementalWall && hrand(100) >= 25) return;
 
   for(auto& oi: orbinfos) {
+    if(oi.orb == itNone) continue;
     if(!(oi.flags & orbgenflags::GLOBAL25)) continue;
 
     int mintreas = 25;
@@ -749,6 +755,7 @@ EX void placeLocalOrbs(cell *c) {
   if(peace::on) return;
   
   for(auto& oi: orbinfos) {
+    if(oi.orb == itNone) continue;
     if(!(oi.flags & orbgenflags::LOCAL10)) continue;
     if(oi.l != l) continue;
     if(yendor::on && (oi.orb == itOrbSafety || oi.orb == itOrbYendor))
@@ -792,6 +799,7 @@ EX void placeCrossroadOrbs(cell *c) {
   if(peace::on) return;
   if(daily::on) return;
   for(auto& oi: orbinfos) {
+    if(oi.orb == itNone) continue;
     if(!(oi.flags & orbgenflags::CROSS10)) continue;
     if(!oi.gchance) continue;
 
@@ -829,6 +837,7 @@ EX void placeCrossroadOrbs(cell *c) {
 EX void placeOceanOrbs(cell *c) {
   if(peace::on) return;
   for(auto& oi: orbinfos) {
+    if(oi.orb == itNone) continue;
     if(!(oi.flags & orbgenflags::CROSS10)) continue;
     
     int treas = items[treasureType(oi.l)] * landMultiplier(oi.l);
