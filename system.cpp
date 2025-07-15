@@ -192,6 +192,11 @@ EX void initgame() {
 
   yendor::init(1);
 
+  if(!safety)
+    gameseed = hrandpos();
+  shrand(gameseed);
+  shufflegame();
+
   if(safety && safetyseed) {
     shrand(safetyseed);
     firstland = safetyland;
@@ -468,7 +473,7 @@ EX namespace scores {
 /** \brief the amount of boxes reserved for each hr::score item */
 #define MAXBOX 500
 /** \brief currently used boxes in hr::score */
-#define POSSCORE 422
+#define POSSCORE 423
 /** \brief a struct to keep local score from an earlier game */
 struct score {
   /** \brief version used */
@@ -986,6 +991,7 @@ EX void applyBoxes() {
   applyBoxNum(load_branching, "load branching");
   applyBoxNum(current_loadcount, "current load count");
   applyBoxNum(gameseed, "@gameseed");
+  applyBoxEnum(orbShuffle, "orb shuffle mode");
 
   if(POSSCORE != boxid) printf("ERROR: %d boxes\n", boxid);
   if(isize(invorb)) { println(hlog, "ERROR: Orbs not taken into account"); exit(1); }
@@ -1421,9 +1427,6 @@ EX void load_last_save() {
   save_turns = turncount;
   loaded_from_save = true;
 
-  shrand(gameseed);
-  shufflegame();
-
   if(loadcount >= 0) {
     loadcount += current_loadcount;
     load_branching += BRANCH_SCALE * log(1 + current_loadcount);
@@ -1711,12 +1714,6 @@ EX void start_game() {
   DEBBI(DF_INIT, ("start_game"));
   if(dual::state == 1) dual::assign_landsides();
 
-  if (!gameseed) {
-    gameseed = hrandpos();
-    shrand(gameseed);
-    shufflegame();
-  }
-
   if(dual::split(start_game)) return;
   restart:
   game_active = true;
@@ -1961,7 +1958,6 @@ auto cgm = addHook(hooks_clearmemory, 40, [] () {
   bow::bowpath.clear();
   bow::clear_bowpath();
   bow::fire_mode = false;
-  gameseed = 0;
   for(auto &am: adj_memo) am.clear();
   }) +
 addHook(hooks_gamedata, 0, [] (gamedata* gd) {
