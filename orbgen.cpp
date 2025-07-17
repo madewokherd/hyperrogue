@@ -519,10 +519,107 @@ EX bool canPlaceInLand(eItem itemtype, eLand l) {
   return true;
 }
 
+bool preplaceLand(eLand land, vector<eLand> &lands_to_assign,
+  vector<orbinfo> &orbs_to_assign, vector<pair<eLand, orbinfo> > &assignments)
+{
+  unsigned int orb_count = 0, i;
+  bool found;
+
+  if (!isLandIngame(land)) return true;
+
+  for (i=0; i < lands_to_assign.size(); i++)
+  {
+    if (land == lands_to_assign[i])
+    {
+      found = true;
+
+      lands_to_assign[i] = lands_to_assign[lands_to_assign.size() - 1];
+      lands_to_assign.pop_back();
+      break;
+    }
+  }
+
+  if (!found) return true; // already placed
+
+  for (auto& oi: orbs_to_assign)
+  {
+    if (canPlaceInLand(oi.orb, land))
+    {
+      orb_count++;
+    }
+  }
+
+  if (!orb_count) return false;
+
+  orb_count = hrand(orb_count);
+
+  for (i=0; i < orbs_to_assign.size(); i++)
+  {
+    auto& oi = orbs_to_assign[i];
+    if (canPlaceInLand(oi.orb, land) && !orb_count--)
+    {
+      assignments.push_back(make_pair(land, oi));
+      orbs_to_assign[i] = orbs_to_assign[orbs_to_assign.size() - 1];
+      orbs_to_assign.pop_back();
+      return true;
+    }
+  }
+
+  return false; // shouldn't happen
+}
+
+bool preplaceOrb(eItem orb, vector<eLand> &lands_to_assign,
+  vector<orbinfo> &orbs_to_assign, vector<pair<eLand, orbinfo> > &assignments)
+{
+  unsigned int land_count, i, j;
+
+  for (i=0; i < orbs_to_assign.size(); i++)
+  {
+    // Use a loop in case this orb appears more than once
+    if (orbs_to_assign[i].orb != orb) continue;
+
+    land_count = 0;
+
+    for (eLand land: lands_to_assign)
+    {
+      if (canPlaceInLand(orb, land))
+        land_count++;
+    }
+
+    if (orbs_to_assign.size() > lands_to_assign.size())
+      // odds of not assigning this orb
+      land_count += orbs_to_assign.size() - lands_to_assign.size();
+
+    if (!land_count) return false;
+
+    land_count = hrand(land_count);
+
+    for (j=0; j < lands_to_assign.size(); j++)
+    {
+      eLand land = lands_to_assign[j];
+      if (canPlaceInLand(orb, land) && !land_count--)
+      {
+        assignments.push_back(make_pair(land, orbs_to_assign[i]));
+
+        orbs_to_assign[i] = orbs_to_assign[orbs_to_assign.size() - 1];
+        orbs_to_assign.pop_back();
+        i--; // examine this index again
+
+        lands_to_assign[j] = lands_to_assign[lands_to_assign.size() - 1];
+        lands_to_assign.pop_back();
+
+        break;
+      }
+    }
+  }
+
+  return true;
+}
+
 EX void shuffleOrbsFull() {
   shuffleOrbsDefault();
 
-  vector<eLand> lands_to_assign;
+  vector<eLand> lands_in_game, lands_to_assign;
   vector<orbinfo> orbs_to_assign;
 
   for (const orbinfo &i: orbinfos_default) {
@@ -532,18 +629,16 @@ EX void shuffleOrbsFull() {
 
     if (!canShuffleOrb(i.orb)) continue;
 
-    if (i.l != laVolcano)
-      lands_to_assign.push_back(i.l);
+    lands_in_game.push_back(i.l);
   }
-
-  if (isLandIngame(laVolcano))
-    lands_to_assign.push_back(laVolcano); // Only a few orbs can go here, so place it first
-
-  orbs_to_assign = orbs_to_place;
 
   vector<pair<eLand, orbinfo>> assignments;
 
-  while (lands_to_assign.size()) {
+  do {
+    orbs_to_assign = orbs_to_place;
+    lands_to_assign = lands_in_game;
+    assignments.clear();
+
     if (lands_to_assign.size() > orbs_to_assign.size())
     {
       while (orbs_to_assign.size() + orbs_to_place.size() <= lands_to_assign.size())
@@ -562,30 +657,30 @@ EX void shuffleOrbsFull() {
       }
     }
 
-    auto land_to_assign = lands_to_assign[lands_to_assign.size()-1];
-    lands_to_assign.pop_back();
+    if (!preplaceLand(laVolcano, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceLand(laPower, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbWinter, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbDomination, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbWoods, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbFish, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbDigging, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbSlaying, lands_to_assign, orbs_to_assign, assignments)) continue;
 
-    int orbinfo_candidate_idx = hrand(orbs_to_assign.size());
-    auto orbinfo_candidate = orbs_to_assign[orbinfo_candidate_idx];
-    orbs_to_assign[orbinfo_candidate_idx] = orbs_to_assign[orbs_to_assign.size()-1];
-    orbs_to_assign.pop_back();
+    while (!lands_to_assign.empty())
+    {
+      auto land_to_assign = lands_to_assign[lands_to_assign.size()-1];
 
-    if (land_to_assign == laNone
-        ? !(orbinfo_candidate.flags & orbgenflags::GUEST)
-        : canPlaceInLand(orbinfo_candidate.orb, land_to_assign)) {
+      int orbinfo_candidate_idx = hrand(orbs_to_assign.size());
+      auto orbinfo_candidate = orbs_to_assign[orbinfo_candidate_idx];
+      orbs_to_assign[orbinfo_candidate_idx] = orbs_to_assign[orbs_to_assign.size()-1];
+      orbs_to_assign.pop_back();
+
+      if (!canPlaceInLand(orbinfo_candidate.orb, land_to_assign))
+        break;
       assignments.push_back(make_pair(land_to_assign, orbinfo_candidate));
+      lands_to_assign.pop_back();
     }
-    else {
-      while (assignments.size()) {
-        auto undo_pair = assignments[assignments.size()-1];
-        assignments.pop_back();
-        lands_to_assign.push_back(undo_pair.first);
-      }
-
-      lands_to_assign.push_back(land_to_assign);
-      orbs_to_assign = orbs_to_place;
-    }
-  }
+  } while (!lands_to_assign.empty());
 
   vector<orbinfo> new_orbinfos = orbinfos_default;
   for (pair<eLand, orbinfo> assignment: assignments) {
