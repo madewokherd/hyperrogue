@@ -203,6 +203,7 @@ EX vector<orbinfo> orbs_to_place = {
   {orbgenflags::S_NATIVE, laNone, 1500, 3500, itOrbPsi},
   {orbgenflags::S_NATIVE, laNone, 900, 1200, itOrbAether},
   {orbgenflags::S_NATIVE, laNone, 800, 1200, itOrbInvis},
+  {orbgenflags::S_NATIVE, laNone, 0, 3000, itOrbFire},
   {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbFriend},
   {orbgenflags::S_NATIVE, laNone, 0, 3000, itOrbDragon},
   {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbTime},
