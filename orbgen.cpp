@@ -512,6 +512,11 @@ EX bool canShuffleOrb(eItem itemtype) {
 EX bool canPlaceInLand(eItem itemtype, eLand l) {
   if (l == laPalace) l = laPrincessQuest;
 
+  if (l == laTemple && among(itemtype, itGreenStone, itOrbDigging, itOrbTime,
+    itOrbEmpathy, itOrbFish, itOrbWoods, itOrbEnergy, itOrbSlaying,
+    itOrbIntensity, itOrbChoice, itOrbImpact, itOrbLuck))
+    return false;
+
   eOrbLandRelation elr = getOLR(itemtype, l);
   if (elr == olrForbidden || elr == olrDangerous || elr == olrUseless ||
     elr == olrPNever || elr == olrBurns) return false;
