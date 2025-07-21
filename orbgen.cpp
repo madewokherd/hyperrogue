@@ -630,7 +630,7 @@ EX void shuffleOrbsFull() {
   for (const orbinfo &i: orbinfos_default) {
     if (!i.is_native()) continue;
 
-    if (!isLandIngame(i.l)) continue;
+    if (dual::state ? !dual::has_land(i.l) : !isLandIngame(i.l)) continue;
 
     if (!canShuffleOrb(i.orb)) continue;
 
