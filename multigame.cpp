@@ -363,6 +363,10 @@ EX namespace dual {
   EX bool check_side(eLand l) {
     return landsides[l] == currently_loaded || landsides[l] == 2;
     }
+  
+  EX bool has_land(eLand l) {
+    return landsides[l] >= 0;
+    }
 
   EX void assign_landsides() {
     switch_to(!currently_loaded);
