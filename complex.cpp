@@ -3372,7 +3372,7 @@ EX namespace prairie {
   EX void generateTreasure_here(cell *c) { 
     int hr = hrand(100);
     if(hr == 0 && items[itGreenGrass] >= 10 && !inv::on) {
-      c->item = itOrbBull;
+      c->item = nativeOrbType(laPrairie);
       // orbs.push_back(c); 
       }
     else if(hr < 1+PRIZEMUL) {
