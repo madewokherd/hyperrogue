@@ -499,6 +499,18 @@ EX eOrbLandRelation getOLR(eItem it, eLand l) {
   return olrPrize25;
   }
 
+EX eOrbLandRelation getOrbTreasureRelation(eItem orb, eItem treasure, eLand land) {
+  eOrbLandRelation result = getOLR(orb, land);
+
+  if (result == olrPrize25 || result == olrPrize3)
+    return treasure == itHolyGrail ? olrPrize3 : olrPrize25;
+
+  if (result == olrNative || result == olrNative1)
+    return treasure == itHolyGrail ? olrNative1 : olrNative;
+  
+  return result;
+}
+
 EX void shuffleOrbsDefault() {
   orbinfos = orbinfos_default;
 }
@@ -804,7 +816,7 @@ EX void placePrizeOrb(cell *c) {
       else continue;
       }
 
-    eOrbLandRelation olr = getOLR(oi.orb, l);
+    eOrbLandRelation olr = getOrbTreasureRelation(oi.orb, treasureType(oi.l), l);
     if(olr != olrPrize25 && olr != olrPrize3) continue;
     int treas = items[treasureType(oi.l)];
     if(olr == olrPrize3) treas *= 10;

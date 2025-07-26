@@ -290,8 +290,8 @@ string princessReviveHelp() {
 
 void describeOrb(string& help, const orbinfo& oi) {
   if(inv::on) return;
-  eOrbLandRelation olr = getOLR(oi.orb, getPrizeLand());
   eItem tr = treasureType(oi.l);
+  eOrbLandRelation olr = getOrbTreasureRelation(oi.orb, tr, getPrizeLand());
   eItem tt = treasureTypeUnlock(cwt.at->land, oi.orb);
   if(olr == olrGuest) {
     for(auto& oi1: orbinfos) 
