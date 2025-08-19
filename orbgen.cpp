@@ -730,6 +730,9 @@ EX void shuffleOrbsChaos() {
     while (true) {
       candidate = orbs_to_place[hrand(orbs_to_place.size())];
       if (!canPlaceInLand(candidate.orb, info.l)) continue;
+      if (info.l == laWhirlpool && (info.flags & orbgenflags::GUEST) && !tactic::on &&
+        !among(candidate.orb, itOrbWater, itOrbSafety, itOrbAether, itOrbFish))
+        continue;
       break;
     }
 
