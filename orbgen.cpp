@@ -259,6 +259,73 @@ EX vector<orbinfo> orbs_to_place = {
   {orbgenflags::S_NATIVE, laNone, 2000, 2000, itOrbWater},
   };
 
+struct orbsyninfo {
+  eItem orb;
+  size_t chance;
+  vector<eItem> synorbs;
+};
+
+vector<orbsyninfo> orbsyninfos = {
+  { itOrbTime, 2, { itOrbThorns, itOrbDigging, itOrbAether, itOrbWoods, itOrbUndeath,
+      itOrbBeauty, itOrbShell, itOrbEnergy, itOrbSword, itOrbSword2, itOrbStone,
+      itOrbFrog, itOrbDash, itOrbHorns, itOrbBull, itOrbSide3, itOrbSide1, itOrbSide2,
+      itOrbPhasing, itOrbSlaying, itOrbImpact, itOrbChaos, itOrbPlague, itOrbPurity } },
+  { itOrbSpace, 2, { itOrbLightning, itOrbFlash, itOrbSpeed, itOrbShield, itOrbTeleport,
+      itOrbSafety, itOrbMorph, itOrbThorns, itOrbPsi, itOrbAether, itOrbFrog, itOrbFish,
+      itOrbStunning, itOrbWoods, itOrbFreedom, itOrb37, itOrbDomination, itOrbShell,
+      itOrbSword, itOrbSword2, itOrbDash, itOrbHorns, itOrbSide3, itOrbSide1, itOrbSide2,
+      itOrbPhasing, itOrbSlaying, itOrbChaos, itOrbPurity } },
+  { itOrbEmpathy, 2, { itOrbLife, itOrbFriend, itOrbUndeath, itOrbDomination,
+      itOrbNature } }, // TODO: itOrbLove, waCloud?
+  { itOrbEmpathy, 2, { itOrbLightning, itOrbFlash, itOrbSpeed, itOrbShield, itOrbThorns,
+      itOrbDigging, itOrbAether, itOrbInvis, itOrbSword, itOrbSword2, itOrbStone,
+      itOrbHorns, itOrbBull, itOrbSide3, itOrbWinter, itOrbSide1, itOrbSide2,
+      itOrbSlaying, itOrbPlague, itOrbPurity } },
+  { itOrbSummon, 2, { itOrbDiscord, itOrbUndeath, itOrbDash, itOrbPhasing, itOrbPlague,
+      itOrbImpact } },
+  { itOrbEnergy, 2, { itOrbLightning, itOrbFlash, itOrbTeleport, itOrbMorph, itOrbPsi,
+      itOrbDragon, itOrbSpace, itOrbIllusion, itOrbFrog, itOrbMatter, itOrbSummon,
+      itOrbStunning, itOrbFreedom, itOrbDash, itOrbPhasing, itOrbChoice, itOrbPurity } },
+  { itOrbMagnetism, 2, { itOrbSpeed, itOrbShield, itOrbSafety, itOrb37, itOrbShell,
+      itOrbPurity } }, // TODO: compass? is that useful anywhere outside of Camelot & Caribbean?
+  { itOrbIntensity, 2, { itOrbSpeed, itOrbShield, itOrbThorns, itOrbDigging,
+      itOrbAether, itOrbInvis, itOrbFire, itOrbSpace, itOrbIllusion, itOrbDiscord,
+      itOrbFrog, itOrbFish, itOrbStunning, itOrbWoods, itOrbAir, itOrbUndeath,
+      itOrbBeauty, itOrb37, itOrbDomination, itOrbShell, itOrbSword, itOrbSword2,
+      itOrbNature, itOrbDash, itOrbHorns, itOrbBull, itOrbLava, itOrbSide3, itOrbWinter,
+      itOrbSide1, itOrbSide2, itOrbPhasing, itOrbSlaying, itOrbGravity, itOrbChaos,
+      itOrbPlague, itOrbPurity, itOrbWater, itOrbPsi, itOrbDragon, itOrbMatter, itOrbStone } },
+  { itOrbChoice, 2, { itOrbSpeed, itOrbShield, itOrbThorns, itOrbDigging,
+      itOrbAether, itOrbInvis, itOrbFire, itOrbSpace, itOrbIllusion, itOrbDiscord,
+      itOrbFrog, itOrbFish, itOrbStunning, itOrbWoods, itOrbAir, itOrbUndeath,
+      itOrbBeauty, itOrb37, itOrbDomination, itOrbShell, itOrbSword, itOrbSword2,
+      itOrbNature, itOrbRecall, itOrbDash, itOrbHorns, itOrbBull, itOrbLava,
+      itOrbSide3, itOrbWinter, itOrbSide1, itOrbSide2, itOrbPhasing, itOrbSlaying,
+      itOrbGravity, itOrbChaos, itOrbPlague, itOrbPurity, itOrbWater, itOrbLightning,
+      itOrbFlash, itOrbLife, itOrbMorph, itOrbPsi, itOrbFriend, itOrbDragon,
+      itOrbMatter, itOrbStone } },
+  { itOrbImpact, 2, { itOrbTeleport, itOrbMorph, itOrbPsi, itOrbDragon, itOrbIllusion,
+      itOrbFrog, itOrbMatter, itOrbSummon, itOrbStunning, itOrbAir, itOrbDash,
+      itOrbPhasing, itOrbNature } },
+  { itOrbRecall, 2, { itOrbLightning, itOrbFlash, itOrbSpeed, itOrbShield,
+      itOrbTeleport, itOrbSafety, itOrbMorph, itOrbThorns, itOrbDigging, itOrbPsi,
+      itOrbAether, itOrbInvis, itOrbFire, itOrbDiscord, itOrbFrog, itOrbFish,
+      itOrbStunning, itOrbWoods, itOrbAir, itOrbUndeath, itOrbFreedom,
+      itOrbBeauty, itOrb37, itOrbDomination, itOrbShell, itOrbSword, itOrbSword2,
+      itOrbNature, itOrbDash, itOrbHorns, itOrbBull, itOrbLava, itOrbWinter,
+      itOrbSide1, itOrbSide2, itOrbPhasing, itOrbSlaying, itOrbGravity,
+      itOrbChaos, itOrbPlague, itOrbPurity, itOrbWater, itOrbFriend,
+      itOrbMatter, itOrbStone } },
+  { itOrbLuck, 2, { itOrbLightning, itOrbFlash, itOrbSpeed, itOrbShield,
+      itOrbTeleport, itOrbSafety, itOrbMorph, itOrbDigging, itOrbPsi, itOrbAether,
+      itOrbInvis, itOrbDiscord, itOrbFrog, itOrbFish, itOrbStunning, itOrbWoods,
+      itOrbAir, itOrbUndeath, itOrbDomination, itOrbShell, itOrbSword, itOrbSword2,
+      itOrbFreedom, itOrbBeauty, itOrb37, itOrbNature, itOrbDash, itOrbHorns,
+      itOrbBull, itOrbSide3, itOrbWinter, itOrbSide1, itOrbSide2, itOrbPhasing,
+      itOrbGravity, itOrbChaos, itOrbPlague, itOrbPurity } }
+  // TODO: itOrbPurity + curses
+};
+
 EX eItem nativeOrbType(eLand l) {
   if(isElemental(l)) l = laElementalWall;
   if(inv::on && (l == laMirror || l == laMirrorOld || isCrossroads(l)))
@@ -762,14 +829,18 @@ EX void shuffleSecondaryOrbsReroll() {
   rerollOrbs(false);
 }
 
-void removeCandidateOrb(vector<orbinfo> &candidates, eItem orb) {
+orbinfo removeCandidateOrb(vector<orbinfo> &candidates, eItem orb) {
+  orbinfo result = {};
   for (size_t i=0; i<candidates.size(); i++){
     if (candidates[i].orb == orb) {
+      result = candidates[i];
       candidates[i] = candidates[candidates.size() - 1];
       candidates.pop_back();
       break;
     }
   }
+
+  return result;
 }
 
 EX void shuffleSecondaryOrbsFull() {
@@ -788,22 +859,40 @@ EX void shuffleSecondaryOrbsFull() {
       eItem required[] = { itOrbWater, itOrbSafety, itOrbAether, itOrbFish };
       eItem orb = required[hrand(4)];
 
-      for (size_t i=0; i < candidate_orbs.size(); i++)
-      {
-        orbinfo o = candidate_orbs[i];
-        if (o.orb == orb)
-        {
-          o.l = laWhirlpool;
-          o.flags = orbgenflags::S_GUEST;
-          o.gchance = 0;
-          new_orbinfos.push_back(o);
-          candidate_orbs[i] = candidate_orbs[candidate_orbs.size() - 1];
-          candidate_orbs.pop_back();
-          num_guest++;
-          break;
-        }
+      orbinfo o = removeCandidateOrb(candidate_orbs, orb);
+      if (o.orb != itNone) {
+        o.l = laWhirlpool;
+        o.flags = orbgenflags::S_GUEST;
+        o.gchance = 0;
+        new_orbinfos.push_back(o);
+        num_guest++;
       }
-      removeCandidateOrb(candidate_orbs, orb);
+    }
+
+    for (orbsyninfo const &s: orbsyninfos) {
+      if (s.orb != info.orb) continue;
+      if (hrand(s.chance) != 0) continue;
+
+      vector<eItem> synorbs = s.synorbs;
+
+      while (!synorbs.empty()) {
+        int i = hrand(synorbs.size());
+        eItem orb = synorbs[i];
+
+        synorbs[i] = synorbs[synorbs.size() - 1];
+        synorbs.pop_back();
+
+        if (!canPlaceInLand(orb, info.l)) continue;
+        orbinfo o = removeCandidateOrb(candidate_orbs, orb);
+        if (o.orb == itNone) continue;
+
+        o.l = info.l;
+        o.flags = orbgenflags::S_GUEST;
+        o.gchance = 0;
+        new_orbinfos.push_back(o);
+        num_guest++;
+        break;
+      }
     }
 
     while (num_guest < 4 && hrand(3) == 0 && !candidate_orbs.empty()) {
