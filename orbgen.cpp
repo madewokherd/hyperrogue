@@ -125,6 +125,7 @@ EX vector<orbinfo> orbinfos_default = {
   {orbgenflags::S_NATIVE, laOcean, 0, 1500, itOrbEmpathy},
   {orbgenflags::S_GUEST,  laOcean, 0, 0, itOrbAir},
   {orbgenflags::S_NATIVE, laCrossroads, 1500, 1500, itNone},
+  {orbgenflags::S_NATIVE, laMirror, 1500, 1500, itNone},
   {orbgenflags::S_NATIVE, laWildWest, 1500, 1500, itNone},
   {orbgenflags::S_NATIVE, laPalace, 0, 4000, itOrbDiscord},
   {orbgenflags::S_GUEST,  laPalace, 0, 0, itOrbFrog},
@@ -719,6 +720,8 @@ EX void shuffleOrbsFull() {
   for (const orbinfo &i: orbinfos_default) {
     if (!i.is_native()) continue;
 
+    if (i.l == laMirror) continue;
+
     if (dual::state ? !dual::has_land(i.l) : !isLandIngame(i.l)) continue;
 
     if (!canShuffleOrb(i.orb)) continue;
@@ -794,6 +797,8 @@ EX void rerollOrbs(bool native) {
   vector<orbinfo> new_orbinfos = orbinfos_default;
   for (unsigned int i = 0; i < new_orbinfos.size(); i++) {
     orbinfo &info = new_orbinfos[i];
+
+    if (info.l == laMirror) continue;
 
     if (!canShuffleOrb(info.orb)) continue;
 
