@@ -1787,11 +1787,21 @@ EX void initConfig() {
 
   param_enum(orbShuffle, "orb_shuffle", orbShuffle)
     -> editable({{"default", "Do not shuffle orbs."},
-      {"chaos", "Native and secondary orbs for most lands changed randomly. Orbs may be duplicated or missing."},
+      {"chaos", "Native orbs for most lands changed randomly. Orbs may be duplicated or missing."},
       {"full", "Native orbs shuffled. Duplicates and missing orbs will be kept to a minimum."}},
       "orb shuffle", 'o')
     -> set_need_confirm()
     -> set_value_to = [] (orbShuffleMode shuf) { bool b = game_active; if(shuf != orbShuffle) stop_game(); orbShuffle = shuf;
+      peace::on = false; if(multi::players > 1) multi::players = 1;
+      if(b) start_game();
+      };
+
+  param_enum(secondaryOrbShuffle, "secondary_orb_shuffle", secondaryOrbShuffle)
+    -> editable({{"default", "Do not shuffle secondary orbs."},
+      {"reroll", "Each land has the same number of secondary orbs, but different orbs."}},
+      "secondary orb shuffle", 's')
+    -> set_need_confirm()
+    -> set_value_to = [] (secondaryOrbShuffleMode shuf) { bool b = game_active; if(shuf != secondaryOrbShuffle) stop_game(); secondaryOrbShuffle = shuf;
       peace::on = false; if(multi::players > 1) multi::players = 1;
       if(b) start_game();
       };
@@ -1833,6 +1843,7 @@ EX bool inSpecialMode() {
     tour::on ||
   #endif
     yendor::on || tactic::on || randomPatternsMode || orbShuffle != osVanilla ||
+    secondaryOrbShuffle != sosVanilla ||
     geometry != gNormal || pmodel != mdDisk || pconf.alpha != 1 || pconf.scale != 1 || 
     rug::rugged || vid.monmode != DEFAULT_MONMODE ||
     vid.wallmode != DEFAULT_WALLMODE;
@@ -1852,6 +1863,7 @@ EX bool have_current_settings() {
   if(tactic::on) modecount += 10;
   if(randomPatternsMode) modecount += 10;
   if(orbShuffle != osVanilla) modecount += 10;
+  if(secondaryOrbShuffle != sosVanilla) modecount += 10;
   if(geometry != gNormal) modecount += 10;
 
   if(modecount > 1)
@@ -1907,6 +1919,9 @@ EX void resetModes(char leave IS('c')) {
   if(randomPatternsMode != (leave == rg::randpattern)) stop_game_and_switch_mode(rg::randpattern);
   if (orbShuffle != osVanilla) {
     stop_game_and_switch_mode(); orbShuffle = osVanilla;
+  }
+  if (secondaryOrbShuffle != sosVanilla) {
+    stop_game_and_switch_mode(); secondaryOrbShuffle = sosVanilla;
   }
   if(multi::players != 1) {
     stop_game_and_switch_mode(); multi::players = 1;

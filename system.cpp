@@ -994,6 +994,7 @@ EX void applyBoxes() {
   applyBoxNum(current_loadcount, "current load count");
   applyBoxNum(gameseed, "@gameseed");
   applyBoxEnum(orbShuffle, "orb shuffle mode");
+  applyBoxEnum(secondaryOrbShuffle, "secondary orb shuffle mode");
 
   if(POSSCORE != boxid) printf("ERROR: %d boxes\n", boxid);
   if(isize(invorb)) { println(hlog, "ERROR: Orbs not taken into account"); exit(1); }
@@ -1707,6 +1708,13 @@ EX void shufflegame() {
     break;
   case osFull:
     shuffleOrbsFull();
+    break;
+  }
+  switch (secondaryOrbShuffle) {
+  case sosVanilla:
+    break;
+  case sosReroll:
+    shuffleSecondaryOrbsReroll();
     break;
   }
 }

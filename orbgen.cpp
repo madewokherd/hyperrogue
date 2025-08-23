@@ -38,9 +38,15 @@ enum orbShuffleMode {
   osChaos,
   osFull
 };
+
+enum secondaryOrbShuffleMode {
+  sosVanilla,
+  sosReroll
+};
 #endif
 
 EX orbShuffleMode orbShuffle;
+EX secondaryOrbShuffleMode secondaryOrbShuffle;
 
 #if HDR
 namespace orbgenflags {
@@ -716,14 +722,15 @@ EX void shuffleOrbsFull() {
   orbinfos = new_orbinfos;
 }
 
-EX void shuffleOrbsChaos() {
-  shuffleOrbsDefault();
-
+EX void rerollOrbs(bool native) {
   vector<orbinfo> new_orbinfos = orbinfos_default;
   for (unsigned int i = 0; i < new_orbinfos.size(); i++) {
     orbinfo &info = new_orbinfos[i];
 
     if (!canShuffleOrb(info.orb)) continue;
+
+    if (native && !info.is_native()) continue;
+    if (!native && info.is_native()) continue;
 
     orbinfo candidate;
 
@@ -743,11 +750,22 @@ EX void shuffleOrbsChaos() {
   orbinfos = new_orbinfos;
 }
 
+EX void shuffleOrbsChaos() {
+  shuffleOrbsDefault();
+
+  rerollOrbs(true);
+}
+
+EX void shuffleSecondaryOrbsReroll() {
+  rerollOrbs(false);
+}
+
 EX void showOrbShuffleMenu() {
   cmode = sm::SIDE | sm::MAYDARK;
   gamescreen();
   dialog::init(XLAT("orb shuffle"));
   add_edit(orbShuffle);
+  add_edit(secondaryOrbShuffle);
   dialog::addBreak(200);
   dialog::addBack();
   dialog::display();
