@@ -323,7 +323,10 @@ vector<orbsyninfo> orbsyninfos = {
       itOrbAir, itOrbUndeath, itOrbDomination, itOrbShell, itOrbSword, itOrbSword2,
       itOrbFreedom, itOrbBeauty, itOrb37, itOrbNature, itOrbDash, itOrbHorns,
       itOrbBull, itOrbSide3, itOrbWinter, itOrbSide1, itOrbSide2, itOrbPhasing,
-      itOrbGravity, itOrbChaos, itOrbPlague, itOrbPurity } }
+      itOrbGravity, itOrbChaos, itOrbPlague, itOrbPurity } },
+  { itOrbPhasing, 2, { itOrbLife, itOrbSpeed, itOrbShield, itOrbFriend, itOrbIllusion,
+      itOrbMatter, itOrbSummon, itOrbStunning, itOrbBeauty, itOrbShell, itOrbStone,
+      itOrbNature, itOrbWinter } }, // TODO: itOrbLove
   // TODO: itOrbPurity + curses
 };
 
@@ -903,6 +906,14 @@ EX void shuffleSecondaryOrbsFull() {
         synorbs.pop_back();
 
         if (!canPlaceInLand(orb, info.l)) continue;
+        
+        // Phasing won't make another orb useful if there's nothing to phase through
+        if (orb == itOrbPhasing && among(info.l, laAlchemist, laCocytus,
+            laMotion, laCamelot, laMinefield, laOcean, laWhirlpool, laZebra,
+            laWildWest, laRose, laEndorian, laKraken, laPrairie, laVolcano,
+            laHunting, laDual, laDocks, laWestWall))
+            continue;
+
         orbinfo o = removeCandidateOrb(candidate_orbs, orb);
         if (o.orb == itNone) continue;
 
