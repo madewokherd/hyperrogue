@@ -339,11 +339,24 @@ EX eItem nativeOrbType(eLand l) {
   return itNone;
   }
 
-EX eItem guestOrbType(eLand l) {
+EX eItem guestOrbType(eLand l, bool fallback) {
+  eItem native = itNone;
+  eItem guest = itNone;
+  int guest_count = 0;
   for(auto& oi: orbinfos)
-    if(oi.l == l && (oi.flags & orbgenflags::GUEST))
-      return oi.orb;
-  return itNone;
+  {
+    if(oi.l == l)
+    {
+      if (oi.flags & orbgenflags::GUEST)
+      {
+        if (hrand(++guest_count) == 0)
+          guest = oi.orb;
+      }
+      if ((oi.flags & orbgenflags::NATIVE) && fallback)
+        native = oi.orb;
+      }
+    }
+  return guest ? guest : native;
   }
 
 const orbinfo& getNativityOrbInfo(eItem orb) {

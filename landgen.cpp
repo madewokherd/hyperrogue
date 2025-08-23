@@ -588,7 +588,7 @@ EX void giantLandSwitch(cell *c, int d, cell *from) {
           c->wall != waOpenGate && !lookingForPrincess0)
           c->item = itPalace;
         if(items[itPalace] >= treasureForLocal() && hrand(5000) < 16 && c->wall != waOpenGate && !inv::on && !peace::on)
-          c->item = hrand(100) < 80 ? guestOrbType(laPalace) : nativeOrbType(laPalace);
+          c->item = hrand(100) < 80 ? guestOrbType(laPalace, true) : nativeOrbType(laPalace);
         if(hrand(5000) < 20*PRIZEMUL && c->wall != waOpenGate)
           placePrizeOrb(c);
         if(c->wall == waNone && buildPrizeMirror(c, 250)) {}
@@ -2193,7 +2193,7 @@ EX void giantLandSwitch(cell *c, int d, cell *from) {
           if(hrand_monster(15000) < 10 + 2 * items[itCoast] + 2 * yendor::hardness())
             c->monst = moAlbatross;
           if(items[itCoast] >= treasureForLocal() && hrand(10000) < 5 && !peace::on && !inv::on)
-            c->item = guestOrbType(laOcean);
+            c->item = guestOrbType(laOcean, true);
           else placeLocalSpecial(c, 10000, 6, 5);
           buildPrizeMirror(c, 2000);
           }

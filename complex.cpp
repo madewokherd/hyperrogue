@@ -1114,10 +1114,10 @@ EX namespace whirlpool {
       // 250 : hard
       if(hrand(5000) < 60 + 3 * items[itWhirlpool] + yendor::hardness())
         wto->monst = moPirate;
-      if(hrand(5000) < 20 && d < -20 && !(tactic::on && guestOrbType(laWhirlpool) == itOrbSafety) && !inv::on)
-        wto->item = guestOrbType(laWhirlpool);
-      else if(hrand(5000) < 20 && d < -20 && !(tactic::on && guestOrbType(laWhirlpool) == itOrbSafety) && markOrb(itOrbLuck))
-        wto->item = guestOrbType(laWhirlpool);
+      if(hrand(5000) < 20 && d < -20 && !(tactic::on && guestOrbType(laWhirlpool, true) == itOrbSafety) && !inv::on)
+        wto->item = guestOrbType(laWhirlpool, true);
+      else if(hrand(5000) < 20 && d < -20 && !(tactic::on && guestOrbType(laWhirlpool, true) == itOrbSafety) && markOrb(itOrbLuck))
+        wto->item = guestOrbType(laWhirlpool, true);
       else if(hrand(5000) < 20*PRIZEMUL && d < -20)
         placePrizeOrb(wto);
       else if(!inv::on && items[itWhirlpool] >= 10 && hrand(5000) < 20 && d < -15)
