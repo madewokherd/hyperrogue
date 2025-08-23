@@ -1716,6 +1716,9 @@ EX void shufflegame() {
   case sosReroll:
     shuffleSecondaryOrbsReroll();
     break;
+  case sosFull:
+    shuffleSecondaryOrbsFull();
+    break;
   }
 }
 

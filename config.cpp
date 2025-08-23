@@ -1798,7 +1798,8 @@ EX void initConfig() {
 
   param_enum(secondaryOrbShuffle, "secondary_orb_shuffle", secondaryOrbShuffle)
     -> editable({{"default", "Do not shuffle secondary orbs."},
-      {"reroll", "Each land has the same number of secondary orbs, but different orbs."}},
+      {"reroll", "Each land has the same number of secondary orbs, but different orbs."},
+      {"full", "Each land has up to 4 random secondary orbs."}},
       "secondary orb shuffle", 's')
     -> set_need_confirm()
     -> set_value_to = [] (secondaryOrbShuffleMode shuf) { bool b = game_active; if(shuf != secondaryOrbShuffle) stop_game(); secondaryOrbShuffle = shuf;

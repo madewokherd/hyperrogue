@@ -41,7 +41,8 @@ enum orbShuffleMode {
 
 enum secondaryOrbShuffleMode {
   sosVanilla,
-  sosReroll
+  sosReroll,
+  sosFull
 };
 #endif
 
@@ -209,16 +210,16 @@ EX vector<orbinfo> orbs_to_place = {
   {orbgenflags::S_NATIVE, laNone, 1500, 3500, itOrbPsi},
   {orbgenflags::S_NATIVE, laNone, 900, 1200, itOrbAether},
   {orbgenflags::S_NATIVE, laNone, 800, 1200, itOrbInvis},
-  {orbgenflags::S_NATIVE, laNone, 0, 3000, itOrbFire},
-  {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbFriend},
-  {orbgenflags::S_NATIVE, laNone, 0, 3000, itOrbDragon},
-  {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbTime},
-  {orbgenflags::S_NATIVE, laNone, 0, 2500, itOrbSpace},
+  {orbgenflags::S_NATIVE, laNone, 800, 3000, itOrbFire},
+  {orbgenflags::S_NATIVE, laNone, 3500, 3500, itOrbFriend},
+  {orbgenflags::S_NATIVE, laNone, 1200, 3000, itOrbDragon},
+  {orbgenflags::S_NATIVE, laNone, 2000, 3500, itOrbTime},
+  {orbgenflags::S_NATIVE, laNone, 2000, 2500, itOrbSpace},
   {orbgenflags::S_NATIVE, laNone, 1000, 1500, itOrbIllusion},
-  {orbgenflags::S_NATIVE, laNone, 0, 1500, itOrbEmpathy},
-  {orbgenflags::S_NATIVE, laNone, 0, 4000, itOrbDiscord},
+  {orbgenflags::S_NATIVE, laNone, 1500, 1500, itOrbEmpathy},
+  {orbgenflags::S_NATIVE, laNone, 1200, 4000, itOrbDiscord},
   {orbgenflags::S_NATIVE, laNone, 500, 2100, itOrbFrog},
-  {orbgenflags::S_NAT_NT, laNone, 0, 1800, itOrbFish},
+  {orbgenflags::S_NAT_NT, laNone, 1200, 1800, itOrbFish},
   {orbgenflags::S_NATIVE, laNone, 500, 4000, itOrbMatter},
   {orbgenflags::S_NAT_NT, laNone, 1500, 4000, itOrbSummon},
   {orbgenflags::S_NATIVE, laNone, 1000, 2500, itOrbStunning},
@@ -238,10 +239,10 @@ EX vector<orbinfo> orbs_to_place = {
   {orbgenflags::S_NATIVE, laNone, 120, 2500, itOrbRecall},
   {orbgenflags::S_NATIVE, laNone, 500, 2100, itOrbDash},
   {orbgenflags::S_NATIVE, laNone, 720, 3000, itOrbHorns},
-  {orbgenflags::S_NATIVE, laNone, 0, 3500, itOrbBull},
-  {orbgenflags::S_NATIVE, laNone, 0, 7000, itOrbLava},
-  {orbgenflags::S_NATIVE, laNone, 0, 2500, itOrbSide3},
-  {orbgenflags::S_NATIVE, laNone, 0, 2000, itOrbWinter},
+  {orbgenflags::S_NATIVE, laNone, 2500, 3500, itOrbBull},
+  {orbgenflags::S_NATIVE, laNone, 2500, 7000, itOrbLava},
+  {orbgenflags::S_NATIVE, laNone, 1200, 2500, itOrbSide3},
+  {orbgenflags::S_NATIVE, laNone, 1500, 2000, itOrbWinter},
   {orbgenflags::S_NATIVE, laNone, 800, 2500, itOrbSide1},
   {orbgenflags::S_NATIVE, laNone, 600, 2500, itOrbSide2},
   {orbgenflags::S_NATIVE, laNone, 2000, 3000, itOrbPhasing}, 
@@ -255,7 +256,7 @@ EX vector<orbinfo> orbs_to_place = {
   {orbgenflags::S_NATIVE, laNone, 800, 2500, itOrbPlague},
   {orbgenflags::S_NATIVE, laNone, 400, 1500, itOrbPurity},
   {orbgenflags::S_NAT_NT, laNone, 500, 800, itOrbLuck},
-  {orbgenflags::S_NATIVE, laNone, 0, 2000, itOrbWater},
+  {orbgenflags::S_NATIVE, laNone, 2000, 2000, itOrbWater},
   };
 
 EX eItem nativeOrbType(eLand l) {
@@ -738,7 +739,8 @@ EX void rerollOrbs(bool native) {
       candidate = orbs_to_place[hrand(orbs_to_place.size())];
       if (!canPlaceInLand(candidate.orb, info.l)) continue;
       if (info.l == laWhirlpool && (info.flags & orbgenflags::GUEST) && !tactic::on &&
-        !among(candidate.orb, itOrbWater, itOrbSafety, itOrbAether, itOrbFish))
+        !among(candidate.orb, itOrbWater, itOrbSafety, itOrbAether, itOrbFish) &&
+        !among(nativeOrbType(laWhirlpool), itOrbWater, itOrbSafety, itOrbAether, itOrbFish))
         continue;
       break;
     }
@@ -758,6 +760,72 @@ EX void shuffleOrbsChaos() {
 
 EX void shuffleSecondaryOrbsReroll() {
   rerollOrbs(false);
+}
+
+void removeCandidateOrb(vector<orbinfo> &candidates, eItem orb) {
+  for (size_t i=0; i<candidates.size(); i++){
+    if (candidates[i].orb == orb) {
+      candidates[i] = candidates[candidates.size() - 1];
+      candidates.pop_back();
+      break;
+    }
+  }
+}
+
+EX void shuffleSecondaryOrbsFull() {
+  vector<orbinfo> new_orbinfos;
+  for (orbinfo const& info: orbinfos) {
+    int num_guest = 0;
+    vector<orbinfo> candidate_orbs = orbs_to_place;
+
+    if (!info.is_native()) continue;
+
+    new_orbinfos.push_back(info);
+
+    removeCandidateOrb(candidate_orbs, info.orb);
+
+    if (info.l == laWhirlpool && !tactic::on && !among(info.orb, itOrbWater, itOrbSafety, itOrbAether, itOrbFish)) {
+      eItem required[] = { itOrbWater, itOrbSafety, itOrbAether, itOrbFish };
+      eItem orb = required[hrand(4)];
+
+      for (size_t i=0; i < candidate_orbs.size(); i++)
+      {
+        orbinfo o = candidate_orbs[i];
+        if (o.orb == orb)
+        {
+          o.l = laWhirlpool;
+          o.flags = orbgenflags::S_GUEST;
+          o.gchance = 0;
+          new_orbinfos.push_back(o);
+          candidate_orbs[i] = candidate_orbs[candidate_orbs.size() - 1];
+          candidate_orbs.pop_back();
+          num_guest++;
+          break;
+        }
+      }
+      removeCandidateOrb(candidate_orbs, orb);
+    }
+
+    while (num_guest < 4 && hrand(3) == 0 && !candidate_orbs.empty()) {
+      while (!candidate_orbs.empty()) {
+        int i = hrand(candidate_orbs.size());
+        orbinfo o = candidate_orbs[i];
+
+        candidate_orbs[i] = candidate_orbs[candidate_orbs.size() - 1];
+        candidate_orbs.pop_back();
+
+        if (!canPlaceInLand(o.orb, info.l)) continue;
+
+        o.l = info.l;
+        o.flags = orbgenflags::S_GUEST;
+        o.gchance = 0;
+        new_orbinfos.push_back(o);
+        num_guest++;
+        break;
+      }
+    }
+  }
+  orbinfos = new_orbinfos;
 }
 
 EX void showOrbShuffleMenu() {
