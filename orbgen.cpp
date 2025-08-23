@@ -853,6 +853,8 @@ EX void shuffleSecondaryOrbsFull() {
 
     new_orbinfos.push_back(info);
 
+    if (info.l == laPower) continue;
+
     removeCandidateOrb(candidate_orbs, info.orb);
 
     if (info.l == laWhirlpool && !tactic::on && !among(info.orb, itOrbWater, itOrbSafety, itOrbAether, itOrbFish)) {
