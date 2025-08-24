@@ -533,6 +533,15 @@ EX void gainItem(eItem it) {
     if(daily::on) achievement_final(false);
 #endif
 
+  if(itemclass(it) == IC_TREASURE)
+  {
+    for (orbinfo &o: orbinfos) {
+      if (treasureType(o.l) == it && o.orb != itNone && !among(o.orb, itOrbSafety, itOrbLife, itOrbFriend)) {
+        items[o.orb] += 2;
+        }
+      }
+    }
+
   int g2 = gold();
   if(items[itFireShard] && items[itAirShard] && items[itWaterShard] && items[itEarthShard]) {
     items[itFireShard]--;

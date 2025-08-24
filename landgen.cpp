@@ -186,7 +186,7 @@ EX int hrand_monster_in(eLand l, int x) {
     x = x * 100 / diff;
     if(x == 0) x = 1;
     }
-  return hrand(x);
+  return hrand(x / 10);
   }
 
 #define hrand_monster(x) hrand_monster_in(c->land, x)

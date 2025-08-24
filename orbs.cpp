@@ -146,12 +146,12 @@ EX void reduceOrbPowers() {
   if(items[itOrbShield]) orbused[itOrbShield] = lastorbused[itOrbShield];
   reduceOrbPower(itOrbTime, cwt.at->land == laCaribbean ? 777 : 150);
   if(invismove && !invisfish) markOrb(itOrbInvis);
-  reduceOrbPower(itOrbLightning, 777);
+  reduceOrbPower(itOrbLightning, 1);
   if(multi::activePlayers() % 2 == 0 && items[itOrbSpeed] && !shmup::on) items[itOrbSpeed] ^= 1;
-  reduceOrbPower(itOrbSpeed, 67);
-  reduceOrbPower(itOrbShield, 77);
+  reduceOrbPower(itOrbSpeed, 1);
+  reduceOrbPower(itOrbShield, 1);
   reduceOrbPower(itOrbShell, 150);
-  reduceOrbPower(itOrbFlash, 777);
+  reduceOrbPower(itOrbFlash, 1);
   reduceOrbPower(itOrbWinter, 77);
   reduceOrbPower(itOrbFire, 77);
   reduceOrbPower(itOrbIllusion, 111);
@@ -1336,7 +1336,7 @@ EX int check_vault(cell *cf, cell *ct, flagtype flags, jumpdata& jdata) {
   bool cutwall = among(c2->wall, waShrub, waExplosiveBarrel, waSmallTree, waBigTree);
   if(!c2->monst && !cutwall) return 2;
   bool for_monster = !(flags & P_ISPLAYER);
-  if(for_monster && c2->monst && frog_power(c2->monst) && !items[itOrbDiscord]) return 2;
+  if(for_monster && c2->monst && among(c2->monst, moFrog, moPhaser, moVaulter) && frog_power(c2->monst) && !items[itOrbDiscord]) return 2;
   if(!cutwall && !passable(c2, cwt.at, flags | P_JUMP1 | P_MONSTER)) return 3;
   if(!passable(ct, c2, flags | P_JUMP2)) return 4;
   if(!cutwall && !canAttack(cwt.at, moPlayer, c2, c2->monst, 0)) return 5;
@@ -1748,6 +1748,7 @@ EX int orbcharges(eItem it) {
     case itOrbEnergy:
       return 50;
     case itOrbRecall:
+      return 5;
     case itOrbNature:
     case itOrbStone:
     case itOrbStunning:

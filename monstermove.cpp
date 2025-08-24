@@ -1230,7 +1230,8 @@ EX void groupmove(eMonster movtype, flagtype mf) {
       groupmove2(movei(c2, c, STRONGWIND), movtype, mf);
       }
     
-    if(frog_power(movtype) && c->monst == moNone && !isPlayerOn(c)) {
+    if(among(movtype, moFrog, moPhaser, moVaulter) && frog_power(movtype) && c->monst == moNone && !isPlayerOn(c)) {
+    printf("???\n");
       forCellEx(c2, c) forCellEx(c3, c2)
         groupmove2(movei(c3, c, JUMP), movtype, mf);
       }

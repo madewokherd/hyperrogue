@@ -503,6 +503,7 @@ EX bignum ivy_total() {
 
 EX void killMonster(cell *c, eMonster who, flagtype deathflags IS(0)) {
   eMonster m = c->monst;
+  eMonster ally = moNone;
   DEBBI(DF_TURN, ("killmonster ", dnameof(m)));
   
   if(!m) return;
@@ -776,7 +777,11 @@ EX void killMonster(cell *c, eMonster who, flagtype deathflags IS(0)) {
   if(who == moPlayer || (isFriendly(who) && items[itOrbEmpathy])) {
     eItem o = frog_power(m);
     if(o && who != moPlayer) markOrb2(itOrbEmpathy);
-    if(o) items[o] += 5;
+    if(o == itOrbLife)
+      ally = moGolem;
+    else if(o == itOrbFriend)
+      ally = moTameBomberbird;
+    else if(o) items[o] += 5;
     }
   if(checkOrb(who, itOrbStone))
     petrify(c, waPetrified, m), pcount = 0;
@@ -876,7 +881,7 @@ EX void killMonster(cell *c, eMonster who, flagtype deathflags IS(0)) {
     }
   else if(c->monst == moTentacleGhost)
     c->monst = moTentacletail;
-  else c->monst = moNone;
+  else c->monst = ally;
 
   if(m == moPair && c->move(c->mondir)->monst == moPair) {
     changes.ccell(c->move(c->mondir));
