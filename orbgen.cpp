@@ -327,6 +327,8 @@ vector<orbsyninfo> orbsyninfos = {
   { itOrbPhasing, 2, { itOrbLife, itOrbSpeed, itOrbShield, itOrbFriend, itOrbIllusion,
       itOrbMatter, itOrbSummon, itOrbStunning, itOrbBeauty, itOrbShell, itOrbStone,
       itOrbNature, itOrbWinter } }, // TODO: itOrbLove
+  { itOrbAether, 2, { itOrbDigging, itOrbFire, itOrbDragon, itOrbMatter, itOrbStone,
+      itOrbLava, itOrbWinter, itOrbWater } },
   // TODO: itOrbPurity + curses
 };
 
@@ -912,6 +914,10 @@ EX void shuffleSecondaryOrbsFull() {
             laMotion, laCamelot, laMinefield, laOcean, laWhirlpool, laZebra,
             laWildWest, laRose, laEndorian, laKraken, laPrairie, laVolcano,
             laHunting, laDual, laDocks, laWestWall))
+            continue;
+
+        if (orb == itOrbAether && among(info.l, laJungle, laMirror, laCamelot,
+            laKraken, laPrairie, laMirrorOld, laHunting))
             continue;
 
         orbinfo o = removeCandidateOrb(candidate_orbs, orb);
