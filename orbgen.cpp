@@ -539,7 +539,7 @@ EX eOrbLandRelation getOLR(eItem it, eLand l) {
   if(it == itOrbWinter && l == laMinefield)
     return olrForbidden;
   
-  if(it == itOrbWinter && !among(l, laRlyeh, laTemple, laVolcano, laCursed)) 
+  if(it == itOrbWinter && !among(l, laRlyeh, laTemple, laVolcano, laCursed, laIce, laDragon, laDryForest, laCocytus, laBlizzard, laVariant, laEclectic)) 
     return olrUseless;
   
   if(it == itOrbLife && l == laMotion)
@@ -551,11 +551,11 @@ EX eOrbLandRelation getOLR(eItem it, eLand l) {
   if(it == itOrbSword && l == laBurial)
     return olrAlways;
     
-  if(it == itOrbFish && !among(l, laOcean, laLivefjord, laWhirlpool, laCamelot, laTortoise, laWarpCoast, laWarpSea, laCocytus, laBrownian, laVariant, laWet, laFrog))
+  if(it == itOrbFish && !among(l, laOcean, laLivefjord, laWhirlpool, laCamelot, laTortoise, laWarpCoast, laWarpSea, laCocytus, laBrownian, laVariant, laWet, laFrog, laDocks))
     return olrUseless;
 
   if(it == itOrbDomination && l != laOcean && l != laRedRock && l != laDesert &&
-    l != laRlyeh && l != laDragon)
+    l != laRlyeh && l != laDragon && l != laSnakeNest)
     return olrUseless;
 
   if(it == itOrbIllusion) return olrPrize3;
@@ -774,8 +774,8 @@ EX void shuffleOrbsFull() {
 
     if (!preplaceLand(laVolcano, lands_to_assign, orbs_to_assign, assignments)) continue;
     if (!preplaceLand(laPower, lands_to_assign, orbs_to_assign, assignments)) continue;
-    if (!preplaceOrb(itOrbWinter, lands_to_assign, orbs_to_assign, assignments)) continue;
     if (!preplaceOrb(itOrbDomination, lands_to_assign, orbs_to_assign, assignments)) continue;
+    if (!preplaceOrb(itOrbWinter, lands_to_assign, orbs_to_assign, assignments)) continue;
     if (!preplaceOrb(itOrbWoods, lands_to_assign, orbs_to_assign, assignments)) continue;
     if (!preplaceOrb(itOrbFish, lands_to_assign, orbs_to_assign, assignments)) continue;
     if (!preplaceOrb(itOrbDigging, lands_to_assign, orbs_to_assign, assignments)) continue;
