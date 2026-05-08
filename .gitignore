@@ -7,3 +7,8 @@
 /hyperroguehyperrogue.ini
 hyperrogue.log
 uuid
+autohdr.h
+hyper.o
+hyperrogue
+.vscode/settings.json
+apsettings.json
