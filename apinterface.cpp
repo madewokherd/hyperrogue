@@ -22,7 +22,7 @@
 #include <math.h>
 #include <limits>
 
-#define VERSION_TUPLE {0,6,0}
+#define VERSION_TUPLE {0,6,7}
 
 
 /*
