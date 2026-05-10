@@ -6,7 +6,7 @@ The randomizer is fully playable but still lacks some documentation and testing.
 
 ## What does it do?
 To send out a check, obtain 10/25/50 treasures (depending on settings) in a land or unlock a land for the first time.
-Checks you obtain are Progressive: For each land, you first obtain the unlock, then its Orb in that land, then its Orb spawning globally, and lastly (Depending on settings) the land is removed from the list of lands required for the Hyperstone quest.
+Items you obtain are Progressive: For each land, you first obtain the unlock, then its Orb in that land, then its Orb spawning globally, and lastly (Depending on settings) the land is removed from the list of lands required for the Hyperstone quest.
 
 
 ### Setup for Windows
