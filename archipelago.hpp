@@ -46,6 +46,7 @@ namespace init {
 
 // Check management
 namespace checks{
+  void hintLand(eLand land);
   bool checkWinCon();
   int alreadyHandledChecks = -1;
   void resetInventory();
@@ -65,6 +66,8 @@ namespace settings{
   goalCondition goal=goalCondition::orbofyendor;
   bool easierHyperstones = true;
   bool deathLink = false;
+  int requiredTreasures = 25;
+  bool hintOrb = false;
   void readSettings(json settings);
   int startLandID=-1;
 }

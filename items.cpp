@@ -6,6 +6,7 @@
  */
 
 #include "hyper.h"
+#include "archipelago.hpp"
 
 namespace hr {
 
@@ -188,6 +189,10 @@ EX bool collectItem(cell *c2, cell *last, bool telekinesis IS(false)) {
     playSound(c2, "pickup-orb"); // TODO summon
     placeGolem(last, c2, moGolem);
     if(cwt.at->monst == moGolem) cwt.at->stuntime = 0;
+    }
+  else if(c2->item == itOrbForesight) {
+    playSound(c2, "pickup-orb");
+    ap::checks::hintLand(c2->land);
     }
   else if(c2->item == itOrbFriend) {
     playSound(c2, "pickup-orb"); // TODO summon

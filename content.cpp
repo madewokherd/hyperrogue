@@ -480,6 +480,8 @@ ITEM( 'o', 0xFF6060, "Orb of Speed", itOrbSpeed, IC_ORB, ZERO | IF_EMPATHY, RESE
     "This orb can be used to move faster for some time.")
 ITEM( 'o', 0x90B090, "Orb of Life", itOrbLife, IC_ORB, ZERO | IF_SHMUPLIFE | IF_REVIVAL, RESERVED, osFriend,
     "This orb can be used to summon friendly golems. It is used instantly when you pick it up.")
+ITEM( 'o', 0x90B090, "Orb of Foresight", itOrbForesight, IC_ORB, ZERO, RESERVED, osUtility,
+    "This orb hints the most difficult location check in its land when picked up.")
 ITEM( 'o', 0x60D760, "Orb of Shielding", itOrbShield, IC_ORB, ZERO | IF_PROTECTION | IF_EMPATHY, RESERVED, osProtective,
     "This orb can protect you from damage.")
 ITEM( 'o', 0x606060, "Orb of Earth", itOrbDigging, IC_ORB, ZERO | IF_EMPATHY, RESERVED, osTerraform,

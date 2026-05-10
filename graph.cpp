@@ -1155,6 +1155,28 @@ EX bool drawItemType(eItem it, cell *c, const shiftmatrix& V, color_t icol, int 
         queuepolyat(Vit1, cgi.shSmallPBody, dark, prio);
         queuepolyat(Vit1, cgi.shDiskM, dark, prio);
         }
+      else if (it == itOrbForesight) {
+        queuepolyat(Vit, cgi.shDisk, dark1, prio);
+        for (int i=0; i<6; i++) {
+          color_t col = 0;
+          switch(i){
+            case 0:
+            col = 0XCA7682;
+            case 1:
+            col = 0X75C175;
+            case 2:
+            col = 0XCA95C2;
+            case 3:
+            col = 0XDAA07D;
+            case 4:
+            col = 0X767EBD;
+            case 5:
+            col = 0XEDE491;
+          }
+          shiftmatrix V2 = Vit * spin(TAU * i / 6 + ptick(300));
+          queuepolyat(V2, cgi.shSmallFlailBall, col, prio);
+          }
+        }
       else if (it == itOrbBull) {
         queuepolyat(Vit, cgi.shDisk, dark1, prio);
         queuepolyat(Vit1, cgi.shTinyBullBody, dark, prio);

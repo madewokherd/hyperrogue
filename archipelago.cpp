@@ -99,6 +99,28 @@ eLand ap::init::getFirstLand(){
 RANDOMIZER CHECK MANAGEMENT
 */
 
+void ap::checks::hintLand(eLand land){
+  LATE(
+  if (client && client->get_state() >= APClient::State::SLOT_CONNECTED) {
+    switch(landProgressChecksSent[linf[land].treasure]){
+      case progressCheck::orbunlocked:
+        if(settings::requiredTreasures >= 25){
+          client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::orbunlockedglobal)}, 1);
+        }
+        break;
+
+      case progressCheck::orbunlockedglobal:
+        if(settings::requiredTreasures >= 50){
+          client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::completed)}, 1);
+        }
+        break;
+
+      default:
+        return;
+    }
+  });
+}
+
 void ap::checks::resetInventory(){
   for(int i=0; i<eItem::ittypes; i++){
     eItem item = eItem(i);
@@ -232,6 +254,8 @@ void ap::settings::readSettings(json settings){
   }
   ap::settings::deathLink = (bool) (int) settings["death_link"];
   ap::settings::startLandID = settings["starting_land"];
+  ap::settings::requiredTreasures = settings["treasure_requirements"];
+  ap::settings::hintOrb = (bool) (int) settings["hint_orb"];
 }
 
 void ap::sendDeathLink(std::string msg)
