@@ -68,7 +68,7 @@ void connect_slot(const std::string& password)
     }
 }
 
-void connect_ap(std::string uri="", std::string newSlot="")
+void connect_ap(const std::string& uri="", const std::string& newSlot="", const std::string& password="")
 {
     ap_socket_connect_sent = true;
     client.reset();
@@ -107,8 +107,8 @@ void connect_ap(std::string uri="", std::string newSlot="")
             ap_socket_connect_sent = false;
         }
     });
-    client->set_room_info_handler([](){
-        connect_slot("");
+    client->set_room_info_handler([password](){
+        connect_slot(password);
     });
     client->set_slot_connected_handler([](const json& data){
         ap::settings::readSettings(data);

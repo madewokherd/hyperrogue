@@ -795,7 +795,11 @@ EX void mainloopiter() {
       json state;
       i >> state;
       i.close();
-      connect_ap(state["ip"], state["slotname"]);
+      if (state.contains("password")) {
+        connect_ap(state["ip"], state["slotname"], state["password"]);
+      } else {
+        connect_ap(state["ip"], state["slotname"]);
+      }
     } else {
       hr::addMessage("Could not open apsettings.json");
     }
