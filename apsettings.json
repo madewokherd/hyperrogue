@@ -1,4 +1,5 @@
 {
     "ip": "archipelago.gg:12345",
-    "slotname": "playername"
+    "slotname": "your-slotname",
+    "password": ""
 }
