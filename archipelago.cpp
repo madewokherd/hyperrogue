@@ -171,9 +171,9 @@ void ap::checks::receiveCheck(APClient::NetworkItem netitem){
 
 void ap::checks::collectCheck(eItem treasure, progressCheck progress){
   if (client && client->get_state() >= APClient::State::SLOT_CONNECTED) {
-    if(treasure != itHyperstone)
+    if(treasure != itHyperstone && ((progress > landProgressChecksSent[treasure] && getVirtualTreasureCount(progress) <= settings::requiredTreasures) | (progress == progressCheck::unlocked && !landUnlockCheckSent[treasure]))){
       client -> LocationChecks({getLocationID(treasure, progress)});
-    return;
+    }
   }
 }
 
@@ -184,20 +184,20 @@ void ap::checks::updateChecks(){
       eItem treasure = linf[l].treasure;
 
       if(ap::landProgressChecksSent[treasure] != progressCheck::notingame && !ap::landUnlockCheckSent[treasure] && landUnlockedLegacy(l)){
-        ap::landUnlockCheckSent[treasure] = true;
         checks::collectCheck(treasure, progressCheck::unlocked);
+        ap::landUnlockCheckSent[treasure] = true;
       }
       if(landProgressChecksSent[treasure]==progressCheck::unlocked && items[treasure]>=(l==laCamelot ? 3 : getVirtualTreasureCount(progressCheck::orbunlocked))){
-        ap::landProgressChecksSent[treasure] = progressCheck::orbunlocked;
         checks::collectCheck(treasure, progressCheck::orbunlocked);
+        ap::landProgressChecksSent[treasure] = progressCheck::orbunlocked;
       }
       if(landProgressChecksSent[treasure]==progressCheck::orbunlocked && items[treasure]>=(l==laCamelot ? 5 : getVirtualTreasureCount(progressCheck::orbunlockedglobal))){
-        ap::landProgressChecksSent[treasure] = progressCheck::orbunlockedglobal;
         checks::collectCheck(treasure, progressCheck::orbunlockedglobal);
+        ap::landProgressChecksSent[treasure] = progressCheck::orbunlockedglobal;
       }
       if(landProgressChecksSent[treasure]==progressCheck::orbunlockedglobal && items[treasure]>=(l==laCamelot ? 8 : getVirtualTreasureCount(progressCheck::completed))){
-        ap::landProgressChecksSent[treasure] = progressCheck::completed;
         checks::collectCheck(treasure, progressCheck::completed);
+        ap::landProgressChecksSent[treasure] = progressCheck::completed;
       }
     }
 
