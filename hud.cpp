@@ -68,7 +68,7 @@ int& ikmerge(int i) {
   }
 
 bool ikappear(int i) {
-  if(i == itInventory && inv::on) return true;
+  if(i == itInventory && (inv::on || inv::ap_orbs)) return true;
   if(i == itCrossbow && bow::crossbow_mode()) return true;
   return ikmerge(i);
   }

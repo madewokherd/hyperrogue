@@ -427,7 +427,7 @@ EX void initgame() {
     #endif
     got_achievements = {};
 #if CAP_INV
-    if(inv::on) inv::init();
+    if(inv::on || inv::ap_orbs) inv::init();
 #endif
 #if CAP_COMPLEX2
     mine::auto_teleport_charges();

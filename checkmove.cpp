@@ -411,7 +411,7 @@ EX void checkmove() {
   dynamicval<eGravity> gs(gravity_state, gravity_state);
 
 #if CAP_INV
-  if(inv::on) inv::compute();
+  if(inv::on || inv::ap_orbs) inv::compute();
 #endif
 
   if(multi::players > 1 && !multi::checkonly) return;
@@ -452,7 +452,7 @@ EX void checkmove() {
   if(!canmove && bow::crossbow_mode() && !items[itCrossbow]) canmove = bow::have_bow_target();
 
 #if CAP_INV  
-  if(inv::on && !canmove && !inv::incheck) {
+  if((inv::on || inv::ap_orbs) && !canmove && !inv::incheck) {
     if(inv::remaining[itOrbSafety] || inv::remaining[itOrbFreedom])
       canmove = true;
     else {

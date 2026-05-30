@@ -491,7 +491,7 @@ EX int gold(int no IS(0)) {
   if(!(no & NO_LOVE)) {
     bool love = items[itOrbLove];
 #if CAP_INV
-    if(inv::on && inv::remaining[itOrbLove])
+    if((inv::on || inv::ap_orbs) && inv::remaining[itOrbLove])
       love = true;
 #endif
 #if CAP_DAILY

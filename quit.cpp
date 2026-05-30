@@ -518,7 +518,7 @@ EX void showGameMenu() {
       get_o_key().second();
       });
     #if CAP_INV
-    if(inv::on && items[itInventory]) {
+    if((inv::on || inv::ap_orbs) && items[itInventory]) {
       dialog::addItem(XLAT("inventory"), 'i');
       dialog::add_action([] {
         clearMessages();
@@ -652,7 +652,7 @@ EX void handleKeyQuit(int sym, int uni) {
     fullcenter();
   else if(uni == 'o') get_o_key().second();
 #if CAP_INV
-  else if(uni == 'i' && inv::on) 
+  else if(uni == 'i' && (inv::on || inv::ap_orbs)) 
     pushScreen(inv::show);
 #endif
 #if CAP_SAVE

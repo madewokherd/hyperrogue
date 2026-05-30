@@ -659,7 +659,7 @@ EX void handleKeyNormal(int sym, int uni) {
   
   if(uni == 'o' && DEFAULTNOR(sym)) get_o_key().second();
 #if CAP_INV
-  if(uni == 'i' && DEFAULTNOR(sym) && inv::on && !game_keys_scroll)
+  if(uni == 'i' && DEFAULTNOR(sym) && (inv::on || inv::ap_orbs) && !game_keys_scroll)
     pushScreen(inv::show);
 #endif
   

@@ -72,14 +72,86 @@ void ap::init::initItemByID(){
   ap::itemByID[0X55]=ap::getItemByName("Fuel");
 }
 
+void ap::init::initOrbByID(){
+  ap::orbByID[0X00]=ap::getItemByName("Orb of Flash");
+  ap::orbByID[0X01]=ap::getItemByName("Orb of Life");
+  ap::orbByID[0X02]=ap::getItemByName("Orb of Shielding");
+  ap::orbByID[0X03]=ap::getItemByName("Orb of Storms");
+  ap::orbByID[0X04]=ap::getItemByName("Orb of Speed");
+  ap::orbByID[0X05]=ap::getItemByName("Orb of the Mirror");
+  ap::orbByID[0X06]=ap::getItemByName("Dead Orb");
+  ap::orbByID[0X07]=ap::getItemByName("Orb of Yendor");
+  ap::orbByID[0X08]=ap::getItemByName("Orb of Teleport");
+  ap::orbByID[0X09]=ap::getItemByName("Orb of Safety");
+  ap::orbByID[0X0A]=ap::getItemByName("Orb of Change");
+  ap::orbByID[0X0B]=ap::getItemByName("Orb of Thorns");
+  ap::orbByID[0X0C]=ap::getItemByName("Orb of Aether");
+  ap::orbByID[0X0D]=ap::getItemByName("Orb of Earth");
+  ap::orbByID[0X0E]=ap::getItemByName("Orb of Invisibility");
+  ap::orbByID[0X0F]=ap::getItemByName("Orb of the Mind");
+  ap::orbByID[0X10]=ap::getItemByName("Orb of Fire");
+  ap::orbByID[0X11]=ap::getItemByName("Orb of Trickery");
+  ap::orbByID[0X12]=ap::getItemByName("Orb of the Dragon");
+  ap::orbByID[0X13]=ap::getItemByName("Orb of Time");
+  ap::orbByID[0X14]=ap::getItemByName("Orb of Space");
+  ap::orbByID[0X15]=ap::getItemByName("Orb of Friendship");
+  ap::orbByID[0X16]=ap::getItemByName("Orb of Empathy");
+  ap::orbByID[0X17]=ap::getItemByName("Orb of Water");
+  ap::orbByID[0X18]=ap::getItemByName("Orb of Discord");
+  ap::orbByID[0X19]=ap::getItemByName("Orb of the Fish");
+  ap::orbByID[0X1A]=ap::getItemByName("Orb of Matter");
+  ap::orbByID[0X1B]=ap::getItemByName("Orb of the Frog");
+  ap::orbByID[0X1C]=ap::getItemByName("Orb of Summoning");
+  ap::orbByID[0X1D]=ap::getItemByName("Orb of Stunning");
+  ap::orbByID[0X1E]=ap::getItemByName("Orb of the Woods");
+  ap::orbByID[0X1F]=ap::getItemByName("Orb of Freedom");
+  ap::orbByID[0X20]=ap::getItemByName("Orb of Undeath");
+  ap::orbByID[0X21]=ap::getItemByName("Orb of Air");
+  ap::orbByID[0X22]=ap::getItemByName("Orb of Beauty");
+  ap::orbByID[0X23]=ap::getItemByName("Orb of the Warp");
+  ap::orbByID[0X24]=ap::getItemByName("Orb of the Shell");
+  ap::orbByID[0X25]=ap::getItemByName("Orb of Energy");
+  ap::orbByID[0X26]=ap::getItemByName("Orb of Domination");
+  ap::orbByID[0X27]=ap::getItemByName("Orb of the Sword");
+  ap::orbByID[0X28]=ap::getItemByName("Orb of the Sword II");
+  ap::orbByID[0X29]=ap::getItemByName("Orb of the Stone");
+  ap::orbByID[0X2A]=ap::getItemByName("Orb of Recall");
+  ap::orbByID[0X2B]=ap::getItemByName("Orb of Nature");
+  ap::orbByID[0X2C]=ap::getItemByName("Orb of Vaulting");
+  ap::orbByID[0X2D]=ap::getItemByName("Orb of the Bull");
+  ap::orbByID[0X2E]=ap::getItemByName("Orb of Horns");
+  ap::orbByID[0X2F]=ap::getItemByName("Orb of Lava");
+  ap::orbByID[0X30]=ap::getItemByName("Orb of Ferocity");
+  ap::orbByID[0X31]=ap::getItemByName("Orb of Winter");
+  ap::orbByID[0X32]=ap::getItemByName("Orb of Slashing");
+  ap::orbByID[0X33]=ap::getItemByName("Orb of Slaying");
+  ap::orbByID[0X34]=ap::getItemByName("Orb of Phasing");
+  ap::orbByID[0X35]=ap::getItemByName("Orb of Choice");
+  ap::orbByID[0X36]=ap::getItemByName("Orb of Gravity");
+  ap::orbByID[0X37]=ap::getItemByName("Orb of Intensity");
+  ap::orbByID[0X38]=ap::getItemByName("Orb of Plague");
+  ap::orbByID[0X39]=ap::getItemByName("Orb of Impact");
+  ap::orbByID[0X3A]=ap::getItemByName("Orb of Chaos");
+  ap::orbByID[0X3B]=ap::getItemByName("Orb of Purity");
+  ap::orbByID[0X3C]=ap::getItemByName("Orb of Luck");
+
+//nonstandard
+//  ap::orbByID[0X50]=ap::getItemByName("Bounty");
+//  ap::orbByID[0X51]=ap::getItemByName("Treat");
+//  ap::orbByID[0X52]=ap::getItemByName("Glowing Crystal");
+//  ap::orbByID[0X53]=ap::getItemByName("Snake Oil");
+//  ap::orbByID[0X54]=ap::getItemByName("Sea Glass");
+//  ap::orbByID[0X55]=ap::getItemByName("Fuel");
+}
+
 constexpr unsigned int str2int(const char* str, int h = 0)
 {
     return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
 
-int ap::getLocationID(eItem treas, ap::progressCheck prog){
+int ap::getLocationID(eItem treas, ap::progressCheck prog, bool extra){
   if(prog == ap::progressCheck::notingame || prog == ap::progressCheck::locked) return -1;
-  int progBaseID = 0X100 * (((int) prog) - 1);
+  int progBaseID = 0X100 * (((int) prog) - 1) + 0X300 * (int) extra;
   switch(str2int(iinf[treas].name)){
   case str2int("Ice Diamond"):         return  HYPERROGUE_BASE_ID + progBaseID + 0x000;
   case str2int("Gold"):                return  HYPERROGUE_BASE_ID + progBaseID + 0x001;

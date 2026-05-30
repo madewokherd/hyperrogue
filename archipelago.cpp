@@ -28,6 +28,10 @@ bool ap::isTreasure(eItem item){
   return (iinf[item].itemclass==IC_TREASURE || item==itHolyGrail);
 }
 
+bool ap::isOrb(eItem item){
+  return (iinf[item].itemclass==IC_ORB);
+}
+
 int ap::getVirtualTreasureCount(progressCheck prog){
   if(inv::on){
     switch (prog){
@@ -62,6 +66,7 @@ void ap::init::initRando(){
   deathLinkPending = false;
   landChecksReceived[itHyperstone] = progressCheck::unlocked;
   init::initItemByID();
+  init::initOrbByID();
   return;
 }
 
@@ -105,13 +110,21 @@ void ap::checks::hintLand(eLand land){
     switch(landProgressChecksSent[linf[land].treasure]){
       case progressCheck::orbunlocked:
         if(settings::requiredTreasures >= 25){
-          client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::orbunlockedglobal)}, 1);
+          if(settings::extra_location_25){
+            client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::orbunlockedglobal, (bool)(rand() % 2))}, 1);
+          } else {
+            client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::orbunlockedglobal, false)}, 1);
+          }
         }
         break;
 
       case progressCheck::orbunlockedglobal:
         if(settings::requiredTreasures >= 50){
-          client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::completed)}, 1);
+          if(settings::extra_location_50){
+            client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::completed, (bool)(rand() % 2))}, 1);
+          } else {
+            client -> LocationScouts({getLocationID(linf[land].treasure, progressCheck::completed, false)}, 1);
+          }
         }
         break;
 
@@ -127,6 +140,10 @@ void ap::checks::resetInventory(){
     if(isTreasure(item)){
       landChecksReceived[item] = ((item==itHyperstone) ? progressCheck::unlocked : progressCheck::locked);
     }
+    if(isOrb(item)){
+      orbsReceived[item] = 0;
+      inv::extra_orbs[item] = 0;
+    }
   }
   return;
 }
@@ -141,8 +158,14 @@ void ap::checks::receiveCheck(APClient::NetworkItem netitem){
     checks::doFullSync();
     ap_sync_queued = true;
   } else {
-    if(netitem.item - HYPERROGUE_BASE_ID != -1){ // Crossroads (init) check is excluded
-      eItem item = itemByID[netitem.item - HYPERROGUE_BASE_ID];
+    int item_id = netitem.item - HYPERROGUE_BASE_ID;
+    if(item_id >= 0x1000){
+      int orb_id = item_id -= 0x1000;
+      inv::extra_orbs[orbByID[orb_id]]++;
+      orbsReceived[orbByID[orb_id]]++;
+    }
+    else if(item_id >= 0){ // Crossroads (init) check and "Nothing" is excluded
+      eItem item = itemByID[item_id];
       switch (landChecksReceived[item])
       {
       case progressCheck::locked: 
@@ -171,8 +194,20 @@ void ap::checks::receiveCheck(APClient::NetworkItem netitem){
 
 void ap::checks::collectCheck(eItem treasure, progressCheck progress){
   if (client && client->get_state() >= APClient::State::SLOT_CONNECTED) {
-    if(treasure != itHyperstone && ((progress > landProgressChecksSent[treasure] && getVirtualTreasureCount(progress) <= settings::requiredTreasures) | (progress == progressCheck::unlocked && !landUnlockCheckSent[treasure]))){
-      client -> LocationChecks({getLocationID(treasure, progress)});
+    if (treasure != itHyperstone && (progress == progressCheck::unlocked && !landUnlockCheckSent[treasure])){
+      client -> LocationChecks({getLocationID(treasure, progress, false)});
+    }
+    if(treasure != itHyperstone && progress > landProgressChecksSent[treasure] && getVirtualTreasureCount(progress) <= settings::requiredTreasures){
+      client -> LocationChecks({getLocationID(treasure, progress, false)});
+    }
+    if(treasure != itHyperstone && progress > landProgressChecksSent[treasure] && progress == progressCheck::orbunlocked && settings::extra_location_10){
+      client -> LocationChecks({getLocationID(treasure, progress, true)});
+    }
+    if(treasure != itHyperstone && progress > landProgressChecksSent[treasure] && progress == progressCheck::orbunlockedglobal && settings::extra_location_25){
+      client -> LocationChecks({getLocationID(treasure, progress, true)});
+    }
+    if(treasure != itHyperstone && progress > landProgressChecksSent[treasure] && progress == progressCheck::completed && settings::extra_location_50){
+      client -> LocationChecks({getLocationID(treasure, progress, true)});
     }
   }
 }
@@ -232,10 +267,19 @@ void ap::checks::doFullSync(){
     for(int i=0; i<eItem::ittypes; i++){
       eItem item = eItem(i);
       if(isTreasure(item)){
-        if(landUnlockCheckSent[item]) locations.push_back(getLocationID(item, progressCheck::unlocked));
-        if(landProgressChecksSent[item]>=progressCheck::orbunlocked) locations.push_back(getLocationID(item, progressCheck::orbunlocked));
-        if(landProgressChecksSent[item]>=progressCheck::orbunlockedglobal) locations.push_back(getLocationID(item, progressCheck::orbunlockedglobal));
-        if(landProgressChecksSent[item]>=progressCheck::completed) locations.push_back(getLocationID(item, progressCheck::completed));
+        if(landUnlockCheckSent[item]) locations.push_back(getLocationID(item, progressCheck::unlocked, false));
+        if(landProgressChecksSent[item]>=progressCheck::orbunlocked) {
+          locations.push_back(getLocationID(item, progressCheck::orbunlocked, false));
+          locations.push_back(getLocationID(item, progressCheck::orbunlocked, true));
+        }
+        if(landProgressChecksSent[item]>=progressCheck::orbunlockedglobal) {
+          locations.push_back(getLocationID(item, progressCheck::orbunlockedglobal, false));
+          locations.push_back(getLocationID(item, progressCheck::orbunlockedglobal, true));
+        }
+        if(landProgressChecksSent[item]>=progressCheck::completed) {
+          locations.push_back(getLocationID(item, progressCheck::completed, false));
+          locations.push_back(getLocationID(item, progressCheck::completed, true));
+        }
       }
     }
     client->LocationChecks(locations);
@@ -256,6 +300,9 @@ void ap::settings::readSettings(json settings){
   ap::settings::startLandID = settings["starting_land"];
   ap::settings::requiredTreasures = settings["treasure_requirements"];
   ap::settings::hintOrb = (bool) (int) settings["hint_orb"];
+  ap::settings::extra_location_10 = (bool) (int) settings["extra_location_10"];
+  ap::settings::extra_location_25 = (bool) (int) settings["extra_location_10"];
+  ap::settings::extra_location_50 = (bool) (int) settings["extra_location_10"];
 }
 
 void ap::sendDeathLink(std::string msg)

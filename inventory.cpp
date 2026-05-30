@@ -24,6 +24,9 @@ EX namespace inv {
   /** \brief extra orbs can be added to OSM using -IX commandline option */
   EX array<int, ittypes> extra_orbs;
 
+  /** \brief Are archipelago orb rewards active? */
+  EX bool ap_orbs;
+
   /** \brief random seed used for hr::inv::invr */
   EX int rseed;
   /** \brief have we used any 'forbidden' orbs? */
@@ -282,6 +285,7 @@ EX namespace inv {
   
   /** \brief Compute how many orbs you get for your current treasure. This is called after every move, and should give consistent results */
   EX void compute() {
+    
     extra = "";
     orbinfoline = "";
 
@@ -293,87 +297,89 @@ EX namespace inv {
       }
     
     sirand(rseed);
-    
-    gainGuestOrbs();
-        
-    gainOrbs(itShard, itOrbMirror);
-    gainOrbs(itHyperstone, itOrbMirror);
-    gainOrbs(itDiamond, itOrbFlash);
-    gainOrbs(itGold, itOrbLife);
-    gainOrbs(itSpice, itOrbShield);
-    gainOrbs(itRuby, itOrbLightning);
-    gainOrbs(itElixir, itOrbSpeed);
-    gainOrbs(itBone, itGreenStone);
-    gainOrbs(itHell, itOrbYendor);
-    gainOrbs(itStatue, itOrbTeleport);
-    gainOrbs(itFeather, itOrbSafety);
-    gainOrbs(itSapphire, itOrbMorph);
-    gainOrbs(itFernFlower, itOrbThorns);
-    gainOrbs(itWine, itOrbAether);
-    gainOrbs(itSilver, itOrbDigging);
-    gainOrbs(itRoyalJelly, itOrbInvis);
-    gainOrbs(itEmerald, itOrbPsi);
-    gainOrbs(itPower, itOrbFire);
-    gainOrbs(itHolyGrail, itOrbIllusion);
-    gainOrbs(itGrimoire, itOrbDragon);
-    gainOrbs(itPirate, itOrbTime);
-    gainOrbs(itRedGem, itOrbSpace);
-    gainOrbs(itBombEgg, itOrbFriend);
-    gainOrbs(itCoast, itOrbEmpathy);
-    gainOrbs(itWhirlpool, itOrbWater);
-    gainOrbs(itPalace, itOrbDiscord);
-    gainOrbs(itFjord, itOrbFish);
-    gainOrbs(itSavedPrincess, itOrbLove);
-    gainOrbs(itIvory, itOrbMatter);
-    gainOrbs(itZebra, itOrbFrog);
-    gainOrbs(itElemental, itOrbSummon);
-    gainOrbs(itFulgurite, itOrbStunning);
-    gainOrbs(itMutant, itOrbWoods);
-    gainOrbs(itMutant2, itOrbFreedom);
-    gainOrbs(itLotus, itOrbUndeath);
-    gainOrbs(itWindstone, itOrbAir);
-    gainOrbs(itRose, itOrbBeauty);
-    gainOrbs(itCoral, itOrb37);
-    gainOrbs(itBabyTortoise, itOrbShell);
-    gainOrbs(itApple, itOrbEnergy);
-    gainOrbs(itDragon, itOrbDomination);
-    gainOrbs(itKraken, itOrbSword);
-    gainOrbs(itBarrow, itOrbSword2);
-    gainOrbs(itTrollEgg, itOrbStone);
-    gainOrbs(itSlime, itOrbRecall);
-    gainOrbs(itAmethyst, itOrbNature);
-    gainOrbs(itDodeca, itOrbDash);
-    gainOrbs(itGreenGrass, itOrbBull);
-    gainOrbs(itBull, itOrbHorns);
-    if(items[itOrbYendor]) remaining[itOrbMirror]++;
-    gainMirrors(itOrbYendor);
-    gainMirrors(itHolyGrail);    
-    gainLove();    
-    gainRandomOrbs(offensiveOrbs, itBone, 25, 0);
-    gainRandomOrbs(elementalOrbs, itElemental, 12, 0);
-    gainRandomOrbs(demonicOrbs, itHell, 20, 100);
-    gainOrbs(itLavaLily, itOrbLava);
-    gainOrbs(itHunting, itOrbSide3);
-    gainOrbs(itBlizzard, itOrbWinter);
-    gainOrbs(itTerra, itOrbSide1);
-    
-    for(auto& it: lateextraorbs) gainLate(it.treasure, it.orb);
-    
-    gainOrbs(itGlowCrystal, itOrbSide2);
-    gainOrbs(itSwitch, itOrbPhasing);
-    gainOrbs(itMagnet, itOrbMagnetism);
-    gainOrbs(itRuins, itOrbSlaying);
-    
-    gainOrbs(itWest, itOrbGravity);
-    gainOrbs(itVarTreasure, itOrbIntensity);
-    gainOrbs(itBrownian, itOrbChoice);
-    
-    gainOrbs(itFrog, itOrbImpact);
-    gainOrbs(itWet, itOrbPlague);
-    gainOrbs(itEclectic, itOrbChaos);
-    
-    gainOrbs(itCursed, itOrbPurity);
-    gainOrbs(itDice, itOrbLuck);
+
+    if(inv::on){
+      gainGuestOrbs();
+          
+      gainOrbs(itShard, itOrbMirror);
+      gainOrbs(itHyperstone, itOrbMirror);
+      gainOrbs(itDiamond, itOrbFlash);
+      gainOrbs(itGold, itOrbLife);
+      gainOrbs(itSpice, itOrbShield);
+      gainOrbs(itRuby, itOrbLightning);
+      gainOrbs(itElixir, itOrbSpeed);
+      gainOrbs(itBone, itGreenStone);
+      gainOrbs(itHell, itOrbYendor);
+      gainOrbs(itStatue, itOrbTeleport);
+      gainOrbs(itFeather, itOrbSafety);
+      gainOrbs(itSapphire, itOrbMorph);
+      gainOrbs(itFernFlower, itOrbThorns);
+      gainOrbs(itWine, itOrbAether);
+      gainOrbs(itSilver, itOrbDigging);
+      gainOrbs(itRoyalJelly, itOrbInvis);
+      gainOrbs(itEmerald, itOrbPsi);
+      gainOrbs(itPower, itOrbFire);
+      gainOrbs(itHolyGrail, itOrbIllusion);
+      gainOrbs(itGrimoire, itOrbDragon);
+      gainOrbs(itPirate, itOrbTime);
+      gainOrbs(itRedGem, itOrbSpace);
+      gainOrbs(itBombEgg, itOrbFriend);
+      gainOrbs(itCoast, itOrbEmpathy);
+      gainOrbs(itWhirlpool, itOrbWater);
+      gainOrbs(itPalace, itOrbDiscord);
+      gainOrbs(itFjord, itOrbFish);
+      gainOrbs(itSavedPrincess, itOrbLove);
+      gainOrbs(itIvory, itOrbMatter);
+      gainOrbs(itZebra, itOrbFrog);
+      gainOrbs(itElemental, itOrbSummon);
+      gainOrbs(itFulgurite, itOrbStunning);
+      gainOrbs(itMutant, itOrbWoods);
+      gainOrbs(itMutant2, itOrbFreedom);
+      gainOrbs(itLotus, itOrbUndeath);
+      gainOrbs(itWindstone, itOrbAir);
+      gainOrbs(itRose, itOrbBeauty);
+      gainOrbs(itCoral, itOrb37);
+      gainOrbs(itBabyTortoise, itOrbShell);
+      gainOrbs(itApple, itOrbEnergy);
+      gainOrbs(itDragon, itOrbDomination);
+      gainOrbs(itKraken, itOrbSword);
+      gainOrbs(itBarrow, itOrbSword2);
+      gainOrbs(itTrollEgg, itOrbStone);
+      gainOrbs(itSlime, itOrbRecall);
+      gainOrbs(itAmethyst, itOrbNature);
+      gainOrbs(itDodeca, itOrbDash);
+      gainOrbs(itGreenGrass, itOrbBull);
+      gainOrbs(itBull, itOrbHorns);
+      if(items[itOrbYendor]) remaining[itOrbMirror]++;
+      gainMirrors(itOrbYendor);
+      gainMirrors(itHolyGrail);    
+      gainLove();    
+      gainRandomOrbs(offensiveOrbs, itBone, 25, 0);
+      gainRandomOrbs(elementalOrbs, itElemental, 12, 0);
+      gainRandomOrbs(demonicOrbs, itHell, 20, 100);
+      gainOrbs(itLavaLily, itOrbLava);
+      gainOrbs(itHunting, itOrbSide3);
+      gainOrbs(itBlizzard, itOrbWinter);
+      gainOrbs(itTerra, itOrbSide1);
+      
+      for(auto& it: lateextraorbs) gainLate(it.treasure, it.orb);
+      
+      gainOrbs(itGlowCrystal, itOrbSide2);
+      gainOrbs(itSwitch, itOrbPhasing);
+      gainOrbs(itMagnet, itOrbMagnetism);
+      gainOrbs(itRuins, itOrbSlaying);
+      
+      gainOrbs(itWest, itOrbGravity);
+      gainOrbs(itVarTreasure, itOrbIntensity);
+      gainOrbs(itBrownian, itOrbChoice);
+      
+      gainOrbs(itFrog, itOrbImpact);
+      gainOrbs(itWet, itOrbPlague);
+      gainOrbs(itEclectic, itOrbChaos);
+      
+      gainOrbs(itCursed, itOrbPurity);
+      gainOrbs(itDice, itOrbLuck);
+    }
 
 #if CAP_DAILY    
     daily::gifts();

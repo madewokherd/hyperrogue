@@ -906,7 +906,7 @@ EX void handleInput(int delta, config &scfg) {
     showMissionScreen();
   
 #if CAP_INV
-  if(act[panInventory].pressed() && inv::on)
+  if(act[panInventory].pressed() && (inv::on || inv::ap_orbs))
     pushScreen(inv::show);
 #endif
   

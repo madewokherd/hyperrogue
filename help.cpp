@@ -146,7 +146,7 @@ EX void buildHelpText() {
     }
 
 #if CAP_INV    
-  if(inv::on && !game_keys_scroll)
+  if((inv::on || inv::ap_orbs) && !game_keys_scroll)
   help += XLAT(
     inv::helptext
     );
@@ -570,7 +570,7 @@ EX string generateHelpForItem(eItem it) {
     help += "\n\n" + other_geometry() + XLAT("This orb lets you attack adjacent cells %1 steps from the primary target.", its(it - itOrbSide1 + 1));
 
 #if CAP_INV
-  if(inv::on && it == itInventory)
+  if((inv::on || inv::ap_orbs) && it == itInventory)
     help += "\n\n" + XLAT(inv::helptext);
 #endif
 

@@ -18,11 +18,14 @@ enum class progressCheck {
 
 #define HYPERROGUE_BASE_ID 0XCBA000
 eItem itemByID[0X60]={eItem::itNone};
+eItem orbByID[0X60]={eItem::itNone};
+
 
 // Check array setup
 progressCheck landChecksReceived[eItem::ittypes]={progressCheck::locked};
+int orbsReceived[eItem::ittypes] = {0};
 // Progress like "10 treasures in land X" can already be achieved without having sent "unlocked land X"
-progressCheck landProgressChecksSent[eItem::ittypes]; 
+progressCheck landProgressChecksSent[eItem::ittypes];
 bool landUnlockCheckSent[eItem::ittypes]={false};
 bool victoryAchieved = false;
 bool victoryPackageSent = false;
@@ -32,9 +35,10 @@ bool deathLinkPending = false;
 // Utility functions
 int getNumberOfProgressedLands(progressCheck prog);
 bool isTreasure(eItem item);
+bool isOrb(eItem item);
 int getVirtualTreasureCount(progressCheck prog);
 eItem getItemByName(std::string name);
-int getLocationID(eItem treas, progressCheck prog);
+int getLocationID(eItem treas, progressCheck prog, bool extra);
 
 // Initialization
 namespace init {
@@ -42,6 +46,7 @@ namespace init {
   void initRando();
   eLand getFirstLand();
   void initItemByID();
+  void initOrbByID();
 }
 
 // Check management
@@ -70,6 +75,9 @@ namespace settings{
   bool hintOrb = false;
   void readSettings(json settings);
   int startLandID=-1;
+  bool extra_location_10 = false;
+  bool extra_location_25 = false;
+  bool extra_location_50 = false;
 }
 
 namespace saves{

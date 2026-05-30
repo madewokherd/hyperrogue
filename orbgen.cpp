@@ -175,7 +175,7 @@ EX vector<orbinfo> orbinfos = {
 
 EX eItem nativeOrbType(eLand l) {
   if(isElemental(l)) l = laElementalWall;
-  if(inv::on && (l == laMirror || l == laMirrorOld || isCrossroads(l)))
+  if((inv::on || inv::ap_orbs) && (l == laMirror || l == laMirrorOld || isCrossroads(l)))
     return itOrbMirror;
   if(l == laMirror || l == laMirrorOld) return itShard;
   for(auto& oi: orbinfos)

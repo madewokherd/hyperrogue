@@ -209,6 +209,7 @@ void connect_ap(const std::string& uri="", const std::string& newSlot="", const 
             ap::init::initialRestartDone = true;
             hr::stop_game();
             hr::start_game();
+            inv::ap_orbs = true;
         }
     });
     client->set_data_package_changed_handler([](const json& data) {
