@@ -34,6 +34,6 @@ sudo apt-get install make g++ libsdl1.2-dev libsdl-ttf2.0-dev libsdl-gfx1.2-dev 
 
 3. In the extracted folder, open apsettings.json and enter your ip and slotname.
 
-4. In the extracted folder, run ./hyperrogue.
+4. In the extracted folder, run ./hyperrogue
 
 5. Enjoy!
