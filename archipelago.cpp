@@ -301,8 +301,8 @@ void ap::settings::readSettings(json settings){
   ap::settings::requiredTreasures = settings["treasure_requirements"];
   ap::settings::hintOrb = (bool) (int) settings["hint_orb"];
   ap::settings::extra_location_10 = (bool) (int) settings["extra_location_10"];
-  ap::settings::extra_location_25 = (bool) (int) settings["extra_location_10"];
-  ap::settings::extra_location_50 = (bool) (int) settings["extra_location_10"];
+  ap::settings::extra_location_25 = (bool) (int) settings["extra_location_25"];
+  ap::settings::extra_location_50 = (bool) (int) settings["extra_location_50"];
 }
 
 void ap::sendDeathLink(std::string msg)
