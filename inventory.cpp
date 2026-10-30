@@ -21,6 +21,12 @@ EX namespace inv {
   EX array<int, ittypes> usedup;
   /** \brief the number of Orbs remaining in each type -- it is recalculated based on your treasure and hr::inv::usedup after every move */
   EX array<int, ittypes> remaining;
+  /** \brief which Orb types have been unlocked */
+  EX array<bool, ittypes> unlocked;
+  /** \brief the number of points used so far */
+  EX int usedpoints;
+  /** \brief the number of points remaining */
+  EX int points;
   /** \brief extra orbs can be added to OSM using -IX commandline option */
   EX array<int, ittypes> extra_orbs;
 
@@ -137,61 +143,8 @@ EX namespace inv {
   
   void gainOrbs(eItem it, eItem o) {
     int qty = items[it];
-    if(it == itHolyGrail) {
-      remaining[itOrbIllusion] += qty;
-      if(it == itOrbIllusion) {
-        orbinfoline += XLAT("Unlocked by: %1 in %2", it, landof(it));
-        orbinfoline += XLAT(" (next at %1)", its(qty+1));
-        }
-      }
-    else {
-      bool nextfound = false;
-      int fst = (ls::any_chaos() ? 5 : 10);
-      if(qty >= fst) remaining[o]++;
-      else {
-        if(whichorbinfo == o) {
-          if(it == itHyperstone) {          
-            extra += extraline(it, its(fst));
-            }
-          else {
-            orbinfoline += XLAT("Unlocked by: %1 in %2", it, landof(it));
-            orbinfoline += XLAT(" (next at %1)", its(10));
-            }
-          }
-        nextfound = true;
-        }
-      int last = fst;
-      for(int k=0; k<30 || !nextfound; k++) {
-        int maxstep = ls::any_chaos() ? 10 + 2 * k : 15 + 5 * k;
-        if(o == itOrbMirror)
-          maxstep += 5 * (k-1) * (k-2);
-        else
-          maxstep += (k-1) * (k-2);
-        int xnext;
-        if(k >= 30 || o == itOrbMirror) {
-          xnext = last + maxstep/2; last = xnext-1;
-          maxstep = 1;
-          }
-        else 
-          xnext = last + 1 + irand(maxstep);
-        if(xnext > qty && !nextfound) {
-          if(whichorbinfo == o) {
-            if(it == itHyperstone) {          
-              extra += extraline(it, its(last+maxstep));
-              }
-            else {
-              orbinfoline += XLAT("Unlocked by: %1 in %2", it, landof(it));
-              if(maxstep == 1)
-                orbinfoline += XLAT(" (next at %1)", its(last+1));
-              else
-                orbinfoline += XLAT(" (next at %1 to %2)", its(last+1), its(last + maxstep));
-              }
-            }
-          nextfound = true;
-          }
-        if(xnext <= qty) remaining[o]++; 
-        last = xnext;
-        }
+    if (!unlocked[o] && qty >= (it == itHolyGrail ? 1 : (ls::any_chaos() ? 5 : 10))) {
+      unlocked[o] = true;
       }
     }
 
@@ -523,7 +476,7 @@ EX namespace inv {
       if(itemclass(o) == IC_ORB && !(classflag(o) & IF_CURSE)) {
         char c = orbkeys[j++];
         if(c == 0) println(hlog, "missing char for ", dnameof(o));
-        if(remaining[i] || usedup[i]) {
+        if(unlocked[i]) {
           orbmap[c] = o;
           if(plain) 
             dialog::addSelItem(XLAT1(iinf[o].name), its(remaining[i]), c);
