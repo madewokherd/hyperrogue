@@ -19,8 +19,6 @@ EX namespace inv {
   EX bool on;
   /** \brief the number of Orbs used up in each type */
   EX array<int, ittypes> usedup;
-  /** \brief the number of Orbs remaining in each type -- it is recalculated based on your treasure and hr::inv::usedup after every move */
-  EX array<int, ittypes> remaining;
   /** \brief which Orb types have been unlocked */
   EX array<bool, ittypes> unlocked;
   /** \brief the number of points used so far */
@@ -143,7 +141,7 @@ EX namespace inv {
   
   void gainOrbs(eItem it, eItem o) {
     int qty = items[it];
-    if (!unlocked[o] && qty >= (it == itHolyGrail ? 1 : (ls::any_chaos() ? 5 : 10))) {
+    if (!unlocked[o] && qty >= ((it == itHolyGrail || it == itSavedPrincess) ? 1 : (ls::any_chaos() ? 5 : 10))) {
       unlocked[o] = true;
       }
     }
@@ -152,13 +150,6 @@ EX namespace inv {
     int z = 1;
     while(z <= i) z <<= 1;
     return z;
-    }
-    
-  void gainMirrors(eItem forwhich) {
-    int qtl = items[forwhich];
-    while(qtl > 0) qtl >>= 1, remaining[itOrbMirror]++;
-    if(whichorbinfo == itOrbMirror)
-      extra += extraline(forwhich, its(nextp2(items[forwhich])));
     }
 
   vector<eItem> offensiveOrbs = {
@@ -176,79 +167,18 @@ EX namespace inv {
     return false;
     }
   
-  void gainRandomOrbs(vector<eItem> orblist, eItem which, int each, int reduce) {
-    const int qoff = isize(orblist);
-    for(int i=1; i<qoff; i++) swap(orblist[i], orblist[irand(1+i)]);
-    for(int i=0; i<20; i++) {
-      int nextat = (i+1)*each + reduce;
-      if(items[which] >= nextat) {
-        remaining[orblist[i%qoff]]++;
-        }
-      else {
-        if(isIn(whichorbinfo, orblist))
-          extra += extraline(which, its(nextat) + "?");
-        break;
-        }
-      }
-    }
-  
-  void gainGuestOrbs() {
-    for(auto& oi: orbinfos) {
-      if(oi.flags & orbgenflags::OSM_AT10) {
-        eItem it = treasureType(oi.l);
-        int fst = ls::any_chaos() ? 5 : 10;
-        if(items[it] >= fst) {
-          remaining[oi.orb]++;
-          }
-        if(whichorbinfo == oi.orb) extra += extraline(it, its(fst));
-        }
-      }
-    }
-  
-  void gainLove() {
-    if(princess::reviveAt) {
-      remaining[itOrbLove]++;
-      int s = gold(NO_LOVE);
-      int last = princess::reviveAt;
-      for(int k=0;; k++) {
-        int nextstep = 50 + 20 * k;
-        last += nextstep;
-        if(last > s) {
-          if(whichorbinfo == itOrbLove) {
-            orbinfoline += XLAT("Unlocked by: %1 in %2", itSavedPrincess, laPrincessQuest);
-            orbinfoline += XLAT(" (next at %1)", its(last));
-            }
-          break;
-          }
-        else { last += nextstep; remaining[itOrbLove]++; }
-        }
-      }
-    }
-  
-  void gainLate(eItem tr, eItem orb) {
-    int at = 10 + irand(41);
-    int itr = items[tr];
-    if(itr >= at) remaining[orb]++;
-    if(whichorbinfo == orb)
-      extra += extraline(tr, itr >= at ? (its(at)+"!") : "10-50");
-    }
-  
   /** \brief Compute how many orbs you get for your current treasure. This is called after every move, and should give consistent results */
   EX void compute() {
     extra = "";
     orbinfoline = "";
 
-    for(int i=0; i<ittypes; i++) remaining[i] = extra_orbs[i]-usedup[i];
-    for(int i=0; i<ittypes; i++) if(usedup[i] >= TESTMIRRORED) {
-      remaining[i] += MIRRORED;
-      remaining[i] -= mirrorqty0(eItem(i));
-      remaining[i] += mirrorqty(eItem(i));
-      }
-    
+    int GOLD_PER_POINT = 25;
+    int g = gold();
+    if (g >= (usedpoints + points + 1) * GOLD_PER_POINT)
+      points = g / 25 - usedpoints;
+
     sirand(rseed);
     
-    gainGuestOrbs();
-        
     gainOrbs(itShard, itOrbMirror);
     gainOrbs(itHyperstone, itOrbMirror);
     gainOrbs(itDiamond, itOrbFlash);
@@ -298,19 +228,11 @@ EX namespace inv {
     gainOrbs(itDodeca, itOrbDash);
     gainOrbs(itGreenGrass, itOrbBull);
     gainOrbs(itBull, itOrbHorns);
-    if(items[itOrbYendor]) remaining[itOrbMirror]++;
-    gainMirrors(itOrbYendor);
-    gainMirrors(itHolyGrail);    
-    gainLove();    
-    gainRandomOrbs(offensiveOrbs, itBone, 25, 0);
-    gainRandomOrbs(elementalOrbs, itElemental, 12, 0);
-    gainRandomOrbs(demonicOrbs, itHell, 20, 100);
+    gainOrbs(itOrbYendor, itOrbMirror);
     gainOrbs(itLavaLily, itOrbLava);
     gainOrbs(itHunting, itOrbSide3);
     gainOrbs(itBlizzard, itOrbWinter);
     gainOrbs(itTerra, itOrbSide1);
-    
-    for(auto& it: lateextraorbs) gainLate(it.treasure, it.orb);
     
     gainOrbs(itGlowCrystal, itOrbSide2);
     gainOrbs(itSwitch, itOrbPhasing);
@@ -334,23 +256,9 @@ EX namespace inv {
 
     if(items[itOrbLove] && !items[itSavedPrincess]) items[itSavedPrincess] = 1;
     
-    int& r = remaining[itGreenStone];
-    
-    if(items[itBone] >= 0) {
-      for(int i=0; i<ittypes; i++) if(i != itGreenStone) {
-        r += usedup[i];
-        if(usedup[i] >= TESTMIRRORED) r -= (MIRRORED - mirrorqty0(eItem(i)));
-        }
-      }
-    
-    items[itGreenStone] += r;
-    usedup[itGreenStone] += r;
-    r = 0;
-    
     if(shmup::on) for(int i=0; i<ittypes; i++) {
-      if(remaining[i] && isShmupLifeOrb(eItem(i))) {
+      if(unlocked[i] && canbuy(i) && isShmupLifeOrb(eItem(i))) {
         gainLife();
-        remaining[i]--;
         usedup[i]++;
         }
       }
