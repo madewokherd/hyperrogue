@@ -42,6 +42,10 @@ EX namespace inv {
   
   static constexpr int MIRRORED = 1000;
   static constexpr int TESTMIRRORED = 900;
+  
+  bool canbuy(eItem o) {
+    return unlocked[o] && points >= usedup[o] + 1;
+    }
 
   struct lateextraorb {
     eItem treasure;
@@ -257,16 +261,13 @@ EX namespace inv {
     if(items[itOrbLove] && !items[itSavedPrincess]) items[itSavedPrincess] = 1;
     
     if(shmup::on) for(int i=0; i<ittypes; i++) {
-      if(unlocked[i] && canbuy(i) && isShmupLifeOrb(eItem(i))) {
+      if(unlocked[i] && canbuy(eItem(i)) && isShmupLifeOrb(eItem(i))) {
         gainLife();
         usedup[i]++;
         }
       }
 
-    items[itInventory] = 0;
-    for(int i=0; i<ittypes; i++) 
-      if(i != itGreenStone && i != itOrbYendor) 
-        items[itInventory] += remaining[i];
+    items[itInventory] = points;
     }
   
   map<char, eItem> orbmap;
@@ -335,10 +336,7 @@ EX namespace inv {
     }
   
   EX string osminfo(eItem orb) {
-    string s = XLAT("Number of uses left: %1", its(remaining[orb]));
-    int us = usedup[orb];
-    if(us >= TESTMIRRORED) s += XLAT(" (mirrored)"), us = us - MIRRORED + mirrorqty0(orb);
-    if(us) s += XLAT(" (used %1 times)", its(us));
+    string s = XLAT("Cost to use: %1", its(usedup[orb] + 1));
     return s;
     }
   
@@ -349,12 +347,12 @@ EX namespace inv {
   
     multi::cpid = 0; /* just in case */
   
-    if(remaining[itOrbSword]) items[itOrbSword]++;
-    if(remaining[itOrbSword2]) items[itOrbSword2]++;
+    if(unlocked[itOrbSword]) items[itOrbSword]++;
+    if(unlocked[itOrbSword2]) items[itOrbSword2]++;
     cmode = sm::CENTER | sm::DARKEN;
     gamescreen();
-    if(remaining[itOrbSword]) items[itOrbSword]--;
-    if(remaining[itOrbSword2]) items[itOrbSword2]--;
+    if(unlocked[itOrbSword]) items[itOrbSword]--;
+    if(unlocked[itOrbSword2]) items[itOrbSword2]--;
 
     orbcoord.clear();
     for(int y=-3; y<=3; y++) for(int x=-5; x<=5; x++) if(x+y<=6 && x+y >= -6 && (x||y))
@@ -387,7 +385,7 @@ EX namespace inv {
         if(unlocked[i]) {
           orbmap[c] = o;
           if(plain) 
-            dialog::addSelItem(XLAT1(iinf[o].name), its(remaining[i]), c);
+            dialog::addSelItem(XLAT1(iinf[o].name), its(usedup[i] + 1), c);
           else {
             if(oc >= isize(orbcoord)) {
               println(hlog, "error: oc=", oc, " with only ", isize(orbcoord), " positions");
@@ -397,7 +395,7 @@ EX namespace inv {
             ld px = current_display->xcenter + 2*rad*pos.first + rad*pos.second;
             ld py = current_display->ycenter + pos.second * rad3;
             int icol = iinf[o].color;
-            if(!remaining[i]) icol = gradient(icol, 0, 0, .5, 1);
+            if(!canbuy(eItem(i))) icol = gradient(icol, 0, 0, .5, 1);
             bool gg = graphglyph(false);
             
             bool b = hypot(mousex-px, mousey-py) < rad;
@@ -411,19 +409,7 @@ EX namespace inv {
                 quickqueue();
                 }
 
-              string s = remaining[i] <= 0 ? "X" : its(remaining[i]);
-
-              if(vid.orbmode < 2) {
-                int tcol = remaining[i] ? darkenedby(icol, 1) : 0;
-
-                if(remaining[i] != 1 || !gg)
-                  displaystr(px, py, 2, gg?rad:rad*3/2, s, tcol, 8);
-                }
-              else {
-                if(remaining[i] != 1 || !gg) {
-                  displayfr(px + rad/2, py + rad/2, 2, gg?rad:rad*3/2, remaining[i] <= 0 ? "X" : remaining[i] == 1 ? "o" : its(remaining[i]), dialog::dialogcolor_over(b), 8);
-                  }
-                }
+              string s = canbuy(eItem(i)) ? its(usedup[i] + 1) : "X";
               }
 
             if(b) {
@@ -464,7 +450,7 @@ EX namespace inv {
             displaystr(vid.xres/2, vid.fsize*5, 2, vid.fsize, XLAT("Extras:")+extra, icol, 8);
           }
 
-        if(remaining[which] != 1 || usedup[which]) {
+        if(unlocked[which]) {
           displaystr(vid.xres/2, vid.yres - vid.fsize*6, 2, vid.fsize, osminfo(which), icol, 8);
           }
 
@@ -503,11 +489,11 @@ EX namespace inv {
         if(view_help_only) {
           gotoHelp(generateHelpForItem(orb));
           }
-        else if(remaining[orb] <= 0) ;
+        else if(!canbuy(orb)) ;
         else if(orb == itOrbMirror) {
           mirroring = !mirroring;
           // an amusing message
-          if(remaining[itOrbMirror] >= 2 && !mirroring) 
+          if(canbuy(itOrbMirror) && !mirroring) 
             addMessage(XLAT("You mirror %the1.", orb));
           if(mirroring) {
             bool next = false;
@@ -524,10 +510,9 @@ EX namespace inv {
             addMessage(XLAT("Each orb type can be mirrored only once."));
             mirroring = false;
             }
-          else if(remaining[orb] > 0) {
+          else if(unlocked[orb]) {
             usedup[itOrbMirror]++;
-            usedup[orb] += MIRRORED;
-            usedup[orb] -= mirrorqty0(orb);
+            usedup[orb] -= 1;
             addMessage(XLAT("You mirror %the1.", orb));
             mirroring = false;
             }
@@ -577,7 +562,7 @@ EX namespace inv {
     for(int i=0; i<ittypes; i++) {
       eItem it = eItem(i);
       if(itemclass(it) == IC_ORB)
-        items[it] += delta * remaining[it] * orbcharges(it);
+        items[it] += delta * (canbuy(it) ? 1 : 0) * orbcharges(it);
       }
     }
 
