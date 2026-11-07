@@ -456,7 +456,7 @@ EX void checkmove(bool complete) {
 
 #if CAP_INV  
   if(inv::on && !canmove && !inv::incheck) {
-    if(inv::remaining[itOrbSafety] || inv::remaining[itOrbFreedom])
+    if(inv::canbuy(itOrbSafety) || inv::canbuy(itOrbFreedom))
       canmove = true;
     else {
       inv::check(1);

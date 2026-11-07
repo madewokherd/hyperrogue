@@ -490,10 +490,6 @@ EX int gold(int no IS(0)) {
   if(!(no & NO_GRAIL)) i += items[itHolyGrail] * 10;
   if(!(no & NO_LOVE)) {
     bool love = items[itOrbLove];
-#if CAP_INV
-    if(inv::on && inv::remaining[itOrbLove])
-      love = true;
-#endif
 #if CAP_DAILY
     if(daily::on) love = false;
 #endif

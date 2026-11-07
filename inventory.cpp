@@ -43,7 +43,7 @@ EX namespace inv {
   static constexpr int MIRRORED = 1000;
   static constexpr int TESTMIRRORED = 900;
   
-  bool canbuy(eItem o) {
+  EX bool canbuy(eItem o) {
     return unlocked[o] && points >= usedup[o] + 1;
     }
 
@@ -170,6 +170,14 @@ EX namespace inv {
     for(auto it: l) if(it == o) return true;
     return false;
     }
+
+  void usedOrb(eItem orb)
+    {
+      usedup[orb]++;
+      usedpoints += usedup[orb];
+      points -= usedup[orb];
+      items[itGreenStone] += abs(usedup[orb]);
+    }
   
   /** \brief Compute how many orbs you get for your current treasure. This is called after every move, and should give consistent results */
   EX void compute() {
@@ -263,7 +271,7 @@ EX namespace inv {
     if(shmup::on) for(int i=0; i<ittypes; i++) {
       if(unlocked[i] && canbuy(eItem(i)) && isShmupLifeOrb(eItem(i))) {
         gainLife();
-        usedup[i]++;
+        usedOrb(eItem(i));
         }
       }
 
@@ -336,7 +344,7 @@ EX namespace inv {
     }
   
   EX string osminfo(eItem orb) {
-    string s = XLAT("Cost to use: %1", its(usedup[orb] + 1));
+    string s = XLAT("Cost to use: %1/%2", its(usedup[orb] + 1), its(points));
     return s;
     }
   
@@ -409,7 +417,16 @@ EX namespace inv {
                 quickqueue();
                 }
 
-              string s = canbuy(eItem(i)) ? its(usedup[i] + 1) : "X";
+              string s = its(usedup[i] + 1);
+
+              if(vid.orbmode < 2) {
+                int tcol = canbuy(eItem(i)) ? darkenedby(icol, 1) : 0;
+
+                displaystr(px, py, 2, gg?rad:rad*3/2, s, tcol, 8);
+                }
+              else {
+                displayfr(px + rad/2, py + rad/2, 2, gg?rad:rad*3/2, s, dialog::dialogcolor_over(b), 8);
+                }
               }
 
             if(b) {
@@ -511,8 +528,8 @@ EX namespace inv {
             mirroring = false;
             }
           else if(unlocked[orb]) {
-            usedup[itOrbMirror]++;
-            usedup[orb] -= 1;
+            usedup[orb]--;
+            usedOrb(itOrbMirror);
             addMessage(XLAT("You mirror %the1.", orb));
             mirroring = false;
             }
@@ -528,7 +545,10 @@ EX namespace inv {
           collectItem(cwt.at, cwt.at, true);
           inv::activating = false;
           addMessage(XLAT("You activate %the1.", orbmap[uni]));
-          if(!cwt.at->item) usedup[orbmap[uni]]++;
+          if(!cwt.at->item)
+            {
+              usedOrb(orbmap[uni]);
+            }
           if(getOLR(it, getPrizeLand()) == olrForbidden)
             usedForbidden = true;
           cwt.at->item = it;

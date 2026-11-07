@@ -508,7 +508,7 @@ EX string generateHelpForItem(eItem it) {
         "you are given a random offensive Orb."
         );
     
-    if(inv::remaining[it] || inv::usedup[it]) help += "\n\n" + inv::osminfo(it);
+    if(inv::unlocked[it]) help += "\n\n" + inv::osminfo(it);
     inv::whichorbinfo = it;  
     inv::compute();
     if(inv::orbinfoline != "") help += "\n\n" + inv::orbinfoline;
